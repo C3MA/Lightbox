@@ -1,4 +1,3 @@
-
 import processing.serial.*;
 Serial myPort;  // Create object from Serial class
 
@@ -15,7 +14,7 @@ DemoThread demoThread;
 
 Bang[] bang = new Bang[255];
 
-int NETWORK_SIZE = 3;
+int NETWORK_SIZE = 5;
 
 void setup() {
   size(640,480);
@@ -122,6 +121,27 @@ synchronized void sendPWMCommandToLightBox(int r, int g, int b, int id){
   command += hex(id,2);
   command += "o";
   sendStringCommandToLightBox(command);
+}
+
+// Lesen von PWM Command für Lightbox
+synchronized void readPWMCommandToLightBox(String command){
+ if ((command.substring(0,2)).equals("pw")) {
+  int r = unhex(command.substring(2,4));
+  int g = unhex(command.substring(4,6));
+  int b = unhex(command.substring(6,8));
+  int id = unhex(command.substring(8,10));
+  if ((command.substring(10,11)).equals("o")) {
+    println("pw");
+    println("Rot: " + r + " Grün: " + g + " Blau: " + b + " Id: " +id);  
+  }
+  else{
+   println("Command nicht Vollständig!"); 
+  }
+ }
+else {
+  println("Lesefehler");
+  println(command.length());
+}
 }
 
 synchronized void sendInit(int id){
@@ -258,6 +278,7 @@ class DemoD extends DemoThread {
       }
     }
 }
+
 
 /*
 class DemoC extends DemoThread {
