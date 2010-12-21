@@ -1,5 +1,7 @@
+
+//needed to use serial to communicate to the lightbox
 import processing.serial.*;
-Serial myPort;  // Create object from Serial class
+Serial myPort;
 
 import controlP5.*;
 ControlP5 controlP5;
@@ -7,14 +9,19 @@ ControlP5 controlP5;
 String textValue = "";
 Textfield myTextfield;
 
+//the slider gui elements 
 Slider sliderDelay;
 Slider sliderDuration;
 
+ColorPicker colorpicker;
+
+//this thread holds the currently running demo
 DemoThread demoThread;
 
+//bangs are used to simulate the lightboxes
 Bang[] bang = new Bang[255];
 
-int NETWORK_SIZE = 5;
+int NETWORK_SIZE = 3;
 
 void setup() {
   size(640,480);
@@ -46,21 +53,34 @@ void setup() {
   tmpB.setCaptionLabel("start DemoC");
   tmpB = controlP5.addButton("demoD"     ,0,20,175,80,19);
   tmpB.setCaptionLabel("start DemoD");  
-  //addd the knobs for demoB
+  tmpB = controlP5.addButton("demoColorPicker", 0,120,100,140,19);
+  tmpB.setCaptionLabel("set colorpicker values");
+
+  //addd the sliders
   sliderDelay = controlP5.addSlider("sliderDelay",1,1000,300, 250,20,100,20);
   sliderDelay.setCaptionLabel("delay");
   sliderDuration = controlP5.addSlider("sliderDuration",1,500,20, 250,60,100,20);
   sliderDuration.setCaptionLabel("duration");
+  
+  //add the colorpicker
+  colorpicker = controlP5.addColorPicker("colorpicker",300,100,255,30);
   
   String portName = Serial.list()[0];
   myPort = new Serial(this, portName, 57600);
 }
 
 void draw() {
-  background(50);
+  background(100);
   
-  stroke(255);
-  line(5, 200, 635, 200);
+  //stroke(255);
+  //line(5, 200, 635, 200);
+}
+
+void stop()
+{
+  //cleanup when the user wants to quit
+  tellOldThreadToKillItself();
+  super.stop();
 }
 
 public void controlEvent(ControlEvent theEvent) {
@@ -91,8 +111,18 @@ public void demoD(int theValue) {
   demoThread.start();
 }
 
+public void demoColorPicker(int theValue) {
+  tellOldThreadToKillItself();
+  demoThread = new DemoColorPicker();
+  demoThread.start();
+}
+
 public void buttonStop(int theValue) {
   tellOldThreadToKillItself();
+}
+
+public void colorpicker(int value){
+  println("colorpicker " + value); 
 }
 
 void tellOldThreadToKillItself(){
@@ -123,27 +153,6 @@ synchronized void sendPWMCommandToLightBox(int r, int g, int b, int id){
   sendStringCommandToLightBox(command);
 }
 
-// Lesen von PWM Command für Lightbox
-synchronized void readPWMCommandToLightBox(String command){
- if ((command.substring(0,2)).equals("pw")) {
-  int r = unhex(command.substring(2,4));
-  int g = unhex(command.substring(4,6));
-  int b = unhex(command.substring(6,8));
-  int id = unhex(command.substring(8,10));
-  if ((command.substring(10,11)).equals("o")) {
-    println("pw");
-    println("Rot: " + r + " Grün: " + g + " Blau: " + b + " Id: " +id);  
-  }
-  else{
-   println("Command nicht Vollständig!"); 
-  }
- }
-else {
-  println("Lesefehler");
-  println(command.length());
-}
-}
-
 synchronized void sendInit(int id){
   String command = "pi";
   command += hex(0,2); // stuffing bytes
@@ -158,7 +167,6 @@ synchronized void sendStringCommandToLightBox(String cmd){
   myPort.write(cmd);
   println(cmd);
 }
-
 
 
 //the base class for the demos, adds the ability 
@@ -203,7 +211,11 @@ class DemoB extends DemoThread {
           delayTime = (int)sliderDelay.value();
           sendPWMCommandToLightBox(0,0,0,1);
           delay(delayTime);
-          sendPWMCommandToLightBox(255,0,0,1);
+          color c = colorpicker.getColorValue();
+            sendPWMCommandToLightBox((int)red(c),
+                                     (int)green(c),
+                                     (int)blue(c),
+                                     1);
           delay(flashTime);
           checkEnd();
         }
@@ -267,11 +279,34 @@ class DemoD extends DemoThread {
           colorValue+= 1;
           colorValue = colorValue % 256;
           
-                sendPWMCommandToLightBox(0,0,colorValue,0);
-                sendPWMCommandToLightBox(0,colorValue, 0,1);
+          sendPWMCommandToLightBox(0,0,colorValue,0);
+          sendPWMCommandToLightBox(0,colorValue, 0,1);
           delay(delayMS);
           
           checkEnd(); 
+        }
+      } catch (Exception e){
+        return;
+      }
+    }
+}
+
+
+class DemoColorPicker extends DemoThread {
+    public void run() {
+      try{
+        int delayMS = (int)sliderDelay.value();
+        while(true){
+          for(int i=0; i < NETWORK_SIZE; i++) {          
+            checkEnd();
+            color c = colorpicker.getColorValue();
+            sendPWMCommandToLightBox((int)(red(c) * (alpha(c)/255)),
+                                     (int)(green(c) * (alpha(c)/255)),
+                                     (int)(blue(c) * (alpha(c)/255)),
+                                     i);
+          }
+          delay(delayMS);
+          checkEnd();
         }
       } catch (Exception e){
         return;
