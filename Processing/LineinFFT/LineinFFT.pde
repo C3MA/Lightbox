@@ -62,14 +62,6 @@ void draw()
   // note that if jingle were a MONO file, 
   // this would be the same as using jingle.right or jingle.left
   fft.forward(in.mix);
-  float value;
-  
-  int box1Red = 0;
-  int box1Green = 0;
-  int box1Blue = 0;
-  int box2Red = 0;
-  int box2Green = 0;
-  int box2Blue = 0;
   
   int[] output = new int[20];
   for(int i=0; i < output.length; i++) {
