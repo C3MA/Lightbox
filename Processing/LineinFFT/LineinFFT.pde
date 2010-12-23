@@ -71,37 +71,35 @@ void draw()
   int box2Green = 0;
   int box2Blue = 0;
   
-  for(int i = 0; i < fft.specSize(); i += 2) // only check every second data
-  {
-    // take the higher one of two neighours
-    value = max(fft.getBand(i), fft.getBand(i + 1));
-    
-    // draw the line for frequency band i, scaling it by 4 so we can see it a bit better
-    if ((i >= 0 && i <= 10) || (i >= 60 && i <= 70))
-      stroke(color(255, 0, 0));
-    else
-       stroke(255);
-    line(i, height, i, height - value * 4);
-    switch(i) {
-     case 0:
-        box1Blue = (int) value*6;
-        break;
-      case 6:
-        box1Red = (int) value*6;
-      case 10:
-        box1Green = (int) value*6;
-        break;
-     case 60: 
-        box2Blue = (int) value*6;
-     case 66: 
-        box2Red = (int) value*6;
-     case 70: 
-        box2Red = (int) value*6;
-        break;
-    }
-    sendPWMCommandToLightBox(box1Red, box1Green, box1Blue, 0);
-    sendPWMCommandToLightBox(box2Red, box2Green, box2Blue, 1);
+  int[] output = new int[20];
+  for(int i=0; i < output.length; i++) {
+    output[i] = 0;
   }
+  
+  int outi=0;
+  int slotsize = fft.specSize() / output.length;
+  
+  for(int i = 0; i < fft.specSize(); i += 1) // shrink spectrum, and use only 80% of the spectrum
+  {
+    stroke(255);
+    line(i, height, i, height - fft.getBand(i) * 4);
+    
+
+    if (i > 0 && i % slotsize == 0) {
+      // draw a horizontal line for each slot
+      stroke(color(255,0,0));
+      line(outi * slotsize, height - output[outi], (outi + 1) * slotsize, height - output[outi]);
+      outi++;    // use the next slot
+      if (outi >= output.length)
+        outi = output.length - 1;
+    }
+    output[outi] = max(output[outi], (int) fft.getBand(i) * 6);
+  }
+  
+  // Display the combined values  
+  sendPWMCommandToLightBox(output[2], output[1], output[0], 0);
+  sendPWMCommandToLightBox(output[3], output[4], output[5], 1);
+    
   fill(255);
   // keep us informed about the window being used
   text("The window being used is: " + windowName, 5, 20);
