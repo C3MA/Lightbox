@@ -83,41 +83,6 @@ void draw()
   {
     stroke(255);
     line(i, height, i, height - fft.getBand(i) * 4);
-    
-<<<<<<< HEAD
-    // draw the line for frequency band i, scaling it by 4 so we can see it a bit better
-    if ((i >= 0 && i <= 10) || (i >= 60 && i <= 70))
-      stroke(color(255, 0, 0));
-    else
-       stroke(255);
-    line(i, height, i, height - value * 4);
-    switch(i) {
-     case 0:
-        box1Blue = (int) value*6;
-        break;
-     // case 6:
-     //   box1Red = (int) value*6;
-     // case 10:
-     //   box1Green = (int) value*6;
-     //   break;
-     //case 60: 
-     //   box2Blue = (int) value*6;
-     //   break;
-     case 66: 
-        box2Red = (int) value*6;
-        break;
-     //case 70: 
-     //   box2Red = (int) value*6;
-     //   break;
-    }
-    //sendPWMCommandToLightBox(box1Red, box1Green, box1Blue, 0);
-    //sendPWMCommandToLightBox(box2Red, box2Green, box2Blue, 1);
-  }
-  
-  sendPWMCommandToLightBox(box1Red, box1Green, box1Blue, 0);
-  sendPWMCommandToLightBox(box2Red, box2Green, box2Blue, 1);
-  
-=======
 
     if (i > 0 && i % slotsize == 0) {
       // draw a horizontal line for each slot
@@ -134,7 +99,6 @@ void draw()
   sendPWMCommandToLightBox(output[2], output[1], output[0], 0);
   sendPWMCommandToLightBox(output[3], output[4], output[5], 1);
     
->>>>>>> b1013ebbe2a4de294c80a774ec8f06c594ac1cb0
   fill(255);
   // keep us informed about the window being used
   text("The window being used is: " + windowName, 5, 20);
