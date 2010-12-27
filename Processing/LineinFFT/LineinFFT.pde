@@ -70,20 +70,21 @@ void draw()
   // note that if jingle were a MONO file, 
   // this would be the same as using jingle.right or jingle.left
   fft.forward(in.mix);
-  float value;
   
-  int box1Red = 0;
-  int box1Green = 0;
-  int box1Blue = 0;
-  int box2Red = 0;
-  int box2Green = 0;
-  int box2Blue = 0;
+  int[] output = new int[20];
+  for(int i=0; i < output.length; i++) {
+    output[i] = 0;
+  }
   
-  for(int i = 0; i < fft.specSize(); i += 2) // only check every second data
+  int outi=0;
+  int slotsize = fft.specSize() / output.length;
+  
+  for(int i = 0; i < fft.specSize(); i += 1) // shrink spectrum, and use only 80% of the spectrum
   {
-    // take the higher one of two neighours
-    value = max(fft.getBand(i), fft.getBand(i + 1));
+    stroke(255);
+    line(i, height, i, height - fft.getBand(i) * 4);
     
+<<<<<<< HEAD
     // draw the line for frequency band i, scaling it by 4 so we can see it a bit better
     if ((i >= 0 && i <= 10) || (i >= 60 && i <= 70))
       stroke(color(255, 0, 0));
@@ -116,6 +117,24 @@ void draw()
   sendPWMCommandToLightBox(box1Red, box1Green, box1Blue, 0);
   sendPWMCommandToLightBox(box2Red, box2Green, box2Blue, 1);
   
+=======
+
+    if (i > 0 && i % slotsize == 0) {
+      // draw a horizontal line for each slot
+      stroke(color(255,0,0));
+      line(outi * slotsize, height - output[outi], (outi + 1) * slotsize, height - output[outi]);
+      outi++;    // use the next slot
+      if (outi >= output.length)
+        outi = output.length - 1;
+    }
+    output[outi] = max(output[outi], (int) fft.getBand(i) * 6);
+  }
+  
+  // Display the combined values  
+  sendPWMCommandToLightBox(output[2], output[1], output[0], 0);
+  sendPWMCommandToLightBox(output[3], output[4], output[5], 1);
+    
+>>>>>>> b1013ebbe2a4de294c80a774ec8f06c594ac1cb0
   fill(255);
   // keep us informed about the window being used
   text("The window being used is: " + windowName, 5, 20);
