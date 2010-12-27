@@ -10,6 +10,11 @@ import ddf.minim.analysis.*;
 import ddf.minim.*;
 import controlP5.*;
 ControlP5 controlP5;
+
+//needed to use serial to communicate to the lightbox
+import processing.serial.*;
+Serial myPort;
+ 
  
 Minim minim;
 AudioInput in;
@@ -52,6 +57,9 @@ void setup()
     bang[i].setColorForeground(0);
   }
   
+  
+  String portName = Serial.list()[0];
+  myPort = new Serial(this, portName, 57600);
 }
  
 void draw()
@@ -86,22 +94,28 @@ void draw()
      case 0:
         box1Blue = (int) value*6;
         break;
-      case 6:
-        box1Red = (int) value*6;
-      case 10:
-        box1Green = (int) value*6;
-        break;
-     case 60: 
-        box2Blue = (int) value*6;
+     // case 6:
+     //   box1Red = (int) value*6;
+     // case 10:
+     //   box1Green = (int) value*6;
+     //   break;
+     //case 60: 
+     //   box2Blue = (int) value*6;
+     //   break;
      case 66: 
         box2Red = (int) value*6;
-     case 70: 
-        box2Red = (int) value*6;
         break;
+     //case 70: 
+     //   box2Red = (int) value*6;
+     //   break;
     }
-    sendPWMCommandToLightBox(box1Red, box1Green, box1Blue, 0);
-    sendPWMCommandToLightBox(box2Red, box2Green, box2Blue, 1);
+    //sendPWMCommandToLightBox(box1Red, box1Green, box1Blue, 0);
+    //sendPWMCommandToLightBox(box2Red, box2Green, box2Blue, 1);
   }
+  
+  sendPWMCommandToLightBox(box1Red, box1Green, box1Blue, 0);
+  sendPWMCommandToLightBox(box2Red, box2Green, box2Blue, 1);
+  
   fill(255);
   // keep us informed about the window being used
   text("The window being used is: " + windowName, 5, 20);
@@ -143,5 +157,11 @@ synchronized void sendPWMCommandToLightBox(int r, int g, int b, int id){
   command += "o";
   println(command);
   //TODO
-  //sendStringCommandToLightBox(command);
+  sendStringCommandToLightBox(command);
+}
+
+
+synchronized void sendStringCommandToLightBox(String cmd){
+  myPort.write(cmd);
+  println(cmd);
 }
