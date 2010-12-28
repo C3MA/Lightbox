@@ -31,10 +31,12 @@ int progModePin = 2;
 // variable to be volatile - the value is
 // read from memory.
 volatile int programmMode = 0;
-volatile unsigned long time;
+volatile unsigned long programmBtnTimeDown;
+volatile int programmBtnReady = 1;
 
 // Install the interrupt routine.
-ISR(INT0_vect) {
+/*
+  ISR(INT0_vect) {
   if (millis() < time + 2000)
     return;
     
@@ -48,11 +50,12 @@ ISR(INT0_vect) {
   else if (0 == programmMode)
      setLedValues(0, 0, 0);
 }
+*/
 
 
 void setup(){
   deviceid = EEPROM.read(1);
-  time = millis(); // initialize time
+  programmBtnTimeDown = millis(); // initialize time
   deviceid = 1; // Set the device to unknown
   resetPorts();
   Serial.begin(57600);
@@ -71,10 +74,10 @@ void setup(){
   
   //uncomment to enable buttons
   // Global Enable INT0 interrupt
-  GICR |= ( 1 << INT0);
+  //GICR |= ( 1 << INT0);
   // Signal change triggers interrupt
-  MCUCR |= ( 1 << ISC00);
-  MCUCR |= ( 0 << ISC01);
+  //MCUCR |= ( 0 << ISC00);
+  //MCUCR |= ( 1 << ISC01);
 }
 
 void resetPorts()
@@ -157,25 +160,32 @@ void sendPingAckOverSerial(){
 void loop()
 {
     
-/*  long test = random (1, 80000);
-  Serial.print("Test Random: ");
-  Serial.println(test);*/
+  if(digitalRead(progModePin) == LOW){
+    if(programmBtnTimeDown == 0 && programmBtnReady == 1){
+      programmBtnTimeDown = millis();
+      programmBtnReady = 0;
+      //setLedValues(100, 0, 0);
+    }
+  }else{
+    programmBtnTimeDown = 0;
+    programmBtnReady = 1;
+    //setLedValues(0, 0, 50);
+  }
   
-  //delay needed to have a chance to get the whole message
-  //delay(10);
-
-/*
-  if (demoMode == 1 && programmMode == 0) {
-    delay(500);
-    // some dummy output ... so Pens is happy  
-    valueRed += 10;
-    valueGreen += 15;
-    valueBlue += 5;
-    valueRed = valueRed % MAX_BRIGHT;
-    valueGreen = valueGreen % MAX_BRIGHT;
-    valueBlue = valueBlue % MAX_BRIGHT;
-    setLedValues(valueRed, valueGreen, valueBlue);
-  }*/
+  if(programmBtnTimeDown > 0 
+      && millis() > programmBtnTimeDown + 500 ){
+    // someone has pressed the programmer button for 500ms
+    programmMode = (programmMode) ? 0 : 1;
+    
+    if (1 == programmMode) 
+      setLedValues(255, 255, 255);
+    else if (0 == programmMode)
+       setLedValues(0, 0, 0);
+       
+    programmBtnTimeDown = 0;
+  }
+  
+  
   
   clearCmdArray();
  
