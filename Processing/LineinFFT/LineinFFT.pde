@@ -96,8 +96,9 @@ void draw()
   }
   
   // Display the combined values  
-  sendPWMCommandToLightBox(output[2], output[1], output[0], 0);
+  sendPWMCommandToLightBox(output[0], output[1], output[2], 0);
   sendPWMCommandToLightBox(output[3], output[4], output[5], 1);
+  sendPWMCommandToLightBox(output[9], output[10], output[11], 2);
     
   fill(255);
   // keep us informed about the window being used

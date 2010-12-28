@@ -54,7 +54,6 @@ volatile int programmBtnReady = 1;
 
 
 void setup(){
-  deviceid = EEPROM.read(1);
   programmBtnTimeDown = millis(); // initialize time
   deviceid = 1; // Set the device to unknown
   resetPorts();
@@ -67,10 +66,14 @@ void setup(){
   Serial.print("Input: ");
   Serial.println(test);
   
-  // read from the sense pin
+  // read from the sense pin 
   pinMode(progModePin, INPUT);
   digitalWrite(progModePin, HIGH);
-  Serial.println("Processing initialization");
+//  Serial.println("Processing initialization");
+  
+  deviceid = EEPROM.read(1);
+  Serial.print("read deviceid = ");
+  Serial.println((int)deviceid);
   
   //uncomment to enable buttons
   // Global Enable INT0 interrupt
@@ -122,8 +125,8 @@ int readFromSerialIntoCmdArray(){
   //there are 11 or more than 11 bytes ready to be read
   
   if(inputSize > 0 && inputSize < CMD_MAX){
-    Serial.print("inputSize: ");
-    Serial.println(inputSize);
+    //Serial.print("inputSize: ");
+    //Serial.println(inputSize);
     for (int i = 0; i < inputSize; i++){
       myCmd[i] = Serial.read();
       if(myCmd[i] == 'o')
@@ -195,8 +198,8 @@ void loop()
     
     
     //debug
-    Serial.print("receiced: ");
-    Serial.println(myCmd);
+    //Serial.print("receiced: ");
+    //Serial.println(myCmd);
     
     int checkCmd = checkCmdArrayForPrefix();
     if(checkCmd == 0){
@@ -237,13 +240,14 @@ void loop()
       if (programmMode) {
       
        //set the id and save in eeprom
-       deviceid = decodeHex(myCmd[8], myCmd[9]);
-       Serial.print("deviceid = ");
-       Serial.print(deviceid);
-       EEPROM.write(1, deviceid);
+       byte newdeviceid = decodeHex(myCmd[8], myCmd[9]);
+       deviceid = newdeviceid;
+       //Serial.print("newdeviceid = ");
+       //Serial.println((int)newdeviceid);
+       EEPROM.write(1, newdeviceid);
        
        programmMode = 0;
-       Serial.print("NACK");
+       //Serial.print("NACK");
        // signalise the user, that this box was initialized
        setLedValues(255, 255, 255);
        delay(500);
@@ -252,6 +256,12 @@ void loop()
        setLedValues(128, 128, 128);
        delay(500);
        setLedValues(0, 0, 0);
+       
+       
+       //EEPROM.write(1, newdeviceid);
+       newdeviceid = EEPROM.read(1);
+       //Serial.print("read newdeviceid = ");
+       //Serial.println((int)newdeviceid);
            
       } else { // No programm mode
         Serial.print("NACK");
