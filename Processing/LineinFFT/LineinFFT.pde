@@ -26,7 +26,7 @@ int NETWORK_SIZE = 4;
  
 void setup()
 {
-  size(512, 200);
+  size(512, 400);
 //    size(512, 200, P3D);
 //  textMode(SCREEN);
   frameRate(25);
@@ -74,13 +74,16 @@ void draw()
     output[i] = 0;
   }
   
+  println("AVG : " + fft.avgSize());
+  
   int outi=0;
   int slotsize = fft.specSize() / output.length;
   
+  maxValue = 0; // reset the global variable
   for(int i = 0; i < fft.specSize(); i += 1) // shrink spectrum, and use only 80% of the spectrum
   {
     stroke(255);
-    line(i, height, i, height - fft.getBand(i) * 4);
+    line(i, height, i, height - fft.getBand(i) * 20);
     
 
     if (i > 0 && i % slotsize == 0) {
@@ -91,15 +94,16 @@ void draw()
       if (outi >= output.length)
         outi = output.length - 1;
     }
-    output[outi] = max(output[outi], (int) fft.getBand(i) * 6);
+    output[outi] = max(output[outi], (int) (fft.getBand(i) * 20 * (i / 4)) );
+    maxValue = max(maxValue, output[outi]);
   }
   
   // Display the combined values
-  sendPWMCommandToLightBox(0, 0, output[0],   0);
-  sendPWMCommandToLightBox(output[3], output[1], 0,  1);
+  sendPWMCommandToLightBox(0, magic(output[1]), magic(output[0]),   0);
+  sendPWMCommandToLightBox(magic(output[2]), magic(output[3]), 0,  1);
   
-  sendPWMCommandToLightBox(output[7], output[5], 0,   2);
-  sendPWMCommandToLightBox(output[11], output[9], 0, 3);
+  sendPWMCommandToLightBox(magic(output[7]), magic(output[6]), 0,   2);
+  sendPWMCommandToLightBox(magic(output[8]), magic(output[9]), 0, 3);
     
   fill(255);
   // keep us informed about the window being used
@@ -140,11 +144,16 @@ synchronized void sendPWMCommandToLightBox(int r, int g, int b, int id){
   command += hex(b,2);
   command += hex(id,2);
   command += "o";
-  println(command);
   sendStringCommandToLightBox(command);
 }
 
 synchronized void sendStringCommandToLightBox(String cmd) {
   myPort.write(cmd);
-  println(cmd);
+//  println(cmd);
+}
+
+int maxValue;
+
+int magic(int number) {
+  return (int) (255.0 * number / maxValue);  
 }
