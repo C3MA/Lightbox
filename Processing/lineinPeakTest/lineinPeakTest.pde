@@ -16,6 +16,8 @@ void setup()
 {
   size(512, 200, P2D);
 
+  frameRate(25);
+
   minim = new Minim(this);
   minim.debugOn();
 
@@ -24,7 +26,7 @@ void setup()
 
 
   beat = new BeatDetect(in.bufferSize(), in.sampleRate());
-  beat.setSensitivity(150);
+  beat.setSensitivity(300);
 
 
   String portName = Serial.list()[0];
@@ -43,23 +45,28 @@ void draw()
     sendPWMCommandToLightBox(0, 0, 0, 1);
 
   if ( beat.isSnare() )
-    sendPWMCommandToLightBox(0, 255, 0, 1);
+    sendPWMCommandToLightBox(0, 255, 0, 2);
   else
-    sendPWMCommandToLightBox(0, 0, 0, 1);
+    sendPWMCommandToLightBox(0, 0, 0, 2);
 
   if ( beat.isHat() )
-    sendPWMCommandToLightBox(0, 0, 255, 1);
+    sendPWMCommandToLightBox(0, 0, 255, 0);
   else
-    sendPWMCommandToLightBox(0, 0, 0, 1);    
+    sendPWMCommandToLightBox(0, 0, 0, 0);    
+
+  if ( beat.isOnset() )
+    sendPWMCommandToLightBox(0, 0, 255, 3);
+  else
+    sendPWMCommandToLightBox(0, 0, 0, 3);
 
   stroke(255);
 
   // draw the waveforms
-  for(int i = 0; i < in.bufferSize() - 1; i++)
+  /*(for(int i = 0; i < in.bufferSize() - 1; i++)
   {
     line(i, 50 + in.left.get(i)*50, i+1, 50 + in.left.get(i+1)*50);
     line(i, 150 + in.right.get(i)*50, i+1, 150 + in.right.get(i+1)*50);
-  }
+  }*/
 }
 
 synchronized void sendPWMCommandToLightBox(int r, int g, int b, int id) {
