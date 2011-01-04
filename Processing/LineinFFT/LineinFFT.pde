@@ -11,10 +11,8 @@ import ddf.minim.*;
 import controlP5.*;
 ControlP5 controlP5;
 
-//needed to use serial to communicate to the lightbox
 import processing.serial.*;
 Serial myPort;
- 
  
 Minim minim;
 AudioInput in;
@@ -24,7 +22,7 @@ String windowName;
 //bangs are used to simulate the lightboxes
 Bang[] bang = new Bang[255];
 
-int NETWORK_SIZE = 3;
+int NETWORK_SIZE = 4;
  
 void setup()
 {
@@ -57,7 +55,7 @@ void setup()
     bang[i].setColorForeground(0);
   }
   
-  
+  // open RS232 Port
   String portName = Serial.list()[0];
   myPort = new Serial(this, portName, 57600);
 }
@@ -83,6 +81,7 @@ void draw()
   {
     stroke(255);
     line(i, height, i, height - fft.getBand(i) * 4);
+    
 
     if (i > 0 && i % slotsize == 0) {
       // draw a horizontal line for each slot
@@ -95,10 +94,12 @@ void draw()
     output[outi] = max(output[outi], (int) fft.getBand(i) * 6);
   }
   
-  // Display the combined values  
-  sendPWMCommandToLightBox(output[0], output[1], output[2], 0);
-  sendPWMCommandToLightBox(output[3], output[4], output[5], 1);
-  sendPWMCommandToLightBox(output[9], output[10], output[11], 2);
+  // Display the combined values
+  sendPWMCommandToLightBox(0, 0, output[0],   0);
+  sendPWMCommandToLightBox(output[3], output[1], 0,  1);
+  
+  sendPWMCommandToLightBox(output[7], output[5], 0,   2);
+  sendPWMCommandToLightBox(output[11], output[9], 0, 3);
     
   fill(255);
   // keep us informed about the window being used
@@ -140,12 +141,10 @@ synchronized void sendPWMCommandToLightBox(int r, int g, int b, int id){
   command += hex(id,2);
   command += "o";
   println(command);
-  //TODO
   sendStringCommandToLightBox(command);
 }
 
-
-synchronized void sendStringCommandToLightBox(String cmd){
+synchronized void sendStringCommandToLightBox(String cmd) {
   myPort.write(cmd);
   println(cmd);
 }

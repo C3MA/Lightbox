@@ -54,6 +54,11 @@ void draw()
   else
     sendPWMCommandToLightBox(0, 0, 0, 0);    
 
+  if ( beat.isOnset() )
+    sendPWMCommandToLightBox(0, 0, 255, 3);
+  else
+    sendPWMCommandToLightBox(0, 0, 0, 3);
+
   stroke(255);
 
   // draw the waveforms
