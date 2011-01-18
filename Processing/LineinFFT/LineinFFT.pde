@@ -22,7 +22,9 @@ String windowName;
 //bangs are used to simulate the lightboxes
 Bang[] bang = new Bang[255];
 
-int NETWORK_SIZE = 4;
+boolean slomotion = false;
+
+int NETWORK_SIZE = 5;
  
 void setup()
 {
@@ -60,6 +62,9 @@ void setup()
   myPort = new Serial(this, portName, 57600);
 }
  
+ 
+int[] output = new int[20];
+  
 void draw()
 {
   background(0);
@@ -68,42 +73,59 @@ void draw()
   // note that if jingle were a MONO file, 
   // this would be the same as using jingle.right or jingle.left
   fft.forward(in.mix);
-  
-  int[] output = new int[20];
-  for(int i=0; i < output.length; i++) {
-    output[i] = 0;
-  }
-  
-  println("AVG : " + fft.avgSize());
-  
+    
   int outi=0;
   int slotsize = fft.specSize() / output.length;
+  int value;
+  
+  if (!slomotion) {
+   for(int i=0; i < output.length; i++)
+      output[i] = 0; 
+  }
+  
+  boolean shrinkValue = false;
   
   maxValue = 0; // reset the global variable
   for(int i = 0; i < fft.specSize(); i += 1) // shrink spectrum, and use only 80% of the spectrum
   {
     stroke(255);
-    line(i, height, i, height - fft.getBand(i) * 20);
     
-
+    value = (int) (fft.getBand(i) * 3);
+    line(i, height, i, height - value);
+    
     if (i > 0 && i % slotsize == 0) {
       // draw a horizontal line for each slot
       stroke(color(255,0,0));
       line(outi * slotsize, height - output[outi], (outi + 1) * slotsize, height - output[outi]);
+      
+      if (slomotion) { // only modify the item once
+        if (shrinkValue)
+          output[outi] -= 2; // fade slowly to the bottom 
+      }
+      
+      shrinkValue = false;
       outi++;    // use the next slot
       if (outi >= output.length)
         outi = output.length - 1;
     }
-    output[outi] = max(output[outi], (int) (fft.getBand(i) * 20 * (i / 4)) );
-    maxValue = max(maxValue, output[outi]);
+    
+    if (slomotion) {
+       if (value < output[outi])
+          shrinkValue=true;
+       else
+         output[outi] = value;
+    } else {
+      output[outi] = max(output[outi],  value);
+    }
+    maxValue = max(maxValue, value);
   }
   
   // Display the combined values
-  sendPWMCommandToLightBox(0, magic(output[1]), magic(output[0]),   0);
-  sendPWMCommandToLightBox(magic(output[2]), magic(output[3]), 0,  1);
-  
-  sendPWMCommandToLightBox(magic(output[7]), magic(output[6]), 0,   2);
-  sendPWMCommandToLightBox(magic(output[8]), magic(output[9]), 0, 3);
+  sendPWMCommandToLightBox(0, magic(output[2]), magic(output[0]),   0);
+  sendPWMCommandToLightBox(0, magic(output[6]), magic(output[4]),  1);
+    sendPWMCommandToLightBox(magic(output[8]), 0, magic(output[10]), 2);
+  sendPWMCommandToLightBox(magic(output[12]), magic(output[14]), 0,   3);
+  sendPWMCommandToLightBox(0, magic(output[15]), magic(output[16]), 4);
     
   fill(255);
   // keep us informed about the window being used
@@ -124,6 +146,15 @@ void keyReleased()
   {
     fft.window(FFT.NONE);
     windowName = "None";
+  }
+  
+  if ( key == 's' )
+  {
+     slomotion = !slomotion; 
+     if (slomotion)
+       windowName = "Slomotion activated";
+     else
+       windowName = "";
   }
 }
  
@@ -149,11 +180,12 @@ synchronized void sendPWMCommandToLightBox(int r, int g, int b, int id){
 
 synchronized void sendStringCommandToLightBox(String cmd) {
   myPort.write(cmd);
-//  println(cmd);
+  println(cmd);
 }
 
 int maxValue;
 
 int magic(int number) {
-  return (int) (255.0 * number / maxValue);  
+//  return (int) (255.0 * number / maxValue);  
+  return number; // No Magic no longer
 }
