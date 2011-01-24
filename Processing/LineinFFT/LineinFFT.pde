@@ -28,7 +28,7 @@ int NETWORK_SIZE = 6;
 
 void setup()
 {
-  size(512, 400);
+  size(800, 600);
   //    size(512, 200, P3D);
   //  textMode(SCREEN);
   frameRate(25);
@@ -68,13 +68,18 @@ void setup()
 /*  fft.window(FFT.HAMMING);
   windowName = "Hamming";*/
   
-  strechPeak = width / fft.specSize();
+  strechPeak = (width * 1.0) / fft.specSize();
+  
+  output = new int[NETWORK_SIZE * 4]; // We have three colors in each box available
+  slotsize = (fft.specSize() * 1.0) / output.length;
+  println("strechPeak = " + strechPeak + "  slotsize = " + slotsize + "   " + (slotsize * strechPeak * output.length) );
 }
 
 
-int[] output = new int[NETWORK_SIZE * 3]; // We have three colors in each box available
+int[] output;
+float slotsize;
 
-int strechPeak;
+float strechPeak;
 int startVisualisationY;
 
 void draw()
@@ -89,7 +94,6 @@ void draw()
   //FIXME testing: fft.inverse(in.mix);
 
   int outi=0;
-  int slotsize = fft.specSize() / output.length;
   int value;
 
   if (!slomotion) {
@@ -102,21 +106,21 @@ void draw()
   fft.linAverages(output.length);  
 
   maxValue = 0; // reset the global variable
-  for(int i = 0; i < fft.specSize(); i += 1) // shrink spectrum, and use only 80% of the spectrum
+  for(int i = 0; i < fft.specSize(); i++) // shrink spectrum, and use only 80% of the spectrum
   {
     stroke(255);
 
-    //value = (int) (fft.getBand(i) * 3);
+    value = (int) (fft.getBand(i) * 5);
     //value = (int) max( (((fft.getBand(i) - 0.30 / 10 ) * fft.specSize() / 7 ) + 2) / 2, Integer.MAX_VALUE);
-    value = (int) (fft.getBand(i) * (((i * 2 + 1) >> i) ));
+//    value = (int) (fft.getBand(i) * (((i * 2 + 1) >> i) ));
       
     
-    line(i* strechPeak, startVisualisationY, (i + 1)* strechPeak, startVisualisationY - value);
+    rect(i* strechPeak, startVisualisationY, strechPeak, -value);
 
     if (i > 0 && i % slotsize == 0) {
       // draw a horizontal line for each slot
       stroke(color(255,0,0));
-      line(outi * slotsize , startVisualisationY - output[outi], (outi + 1) * slotsize, startVisualisationY - output[outi]);
+      line(outi * (slotsize + strechPeak) , startVisualisationY - output[outi], (outi + 1) * (slotsize + strechPeak), startVisualisationY - output[outi]);
 
       if (slomotion) { // only modify the item once
         if (shrinkValue)
