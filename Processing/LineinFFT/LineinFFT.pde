@@ -19,12 +19,15 @@ AudioInput in;
 FFT fft;
 String windowName;
 
+
+final int NETWORK_SIZE = 6;
+
 //bangs are used to simulate the lightboxes
-Bang[] bang = new Bang[255];
+Bang[] bang = new Bang[NETWORK_SIZE];
+Bang[][] colorInput = new Bang[NETWORK_SIZE][3]; // for each node and each color one bang
 
 boolean slomotion = false;
 
-int NETWORK_SIZE = 6;
 
 void setup()
 {
@@ -46,16 +49,41 @@ void setup()
   fft = new FFT(in.bufferSize(), in.sampleRate());
 
   textFont(createFont("Arial", 16));
+  
+  
+  strechPeak = round((width * 1.0) / fft.specSize());
+  
+  output = new int[NETWORK_SIZE * 4]; // We have three colors in each box available
+  slotsize = round((fft.specSize() * 1.0) / output.length);
 
   windowName = "None";
   startVisualisationY = height - 150;
-
+  final int diff = strechPeak * slotsize;
+  final int r = color(255,0,0);
+  final int g = color(0,255,0);
+  final int b = color(0,0,255);
+  
   controlP5 = new ControlP5(this);
   for(int i=0; i < NETWORK_SIZE; i++) { 
-    bang[i] = controlP5.addBang("bang" + i,5 + (i*25), startVisualisationY + 20 ,20,20);
+    bang[i] = controlP5.addBang("bang" + i, 400 + (i*25), 2 ,20,20);
     bang[i].setId(i);
     bang[i].setCaptionLabel(""+i);
     bang[i].setColorForeground(0);
+    
+    colorInput[i][0] = controlP5.addBang("colorRed" + i, 5 + (i * diff), startVisualisationY + 20, 20, 20);
+    colorInput[i][0].setId(i);
+    colorInput[i][0].setCaptionLabel(""+i);
+    colorInput[i][0].setColorForeground(r);
+    
+    colorInput[i][1] = controlP5.addBang("colorGreen" + i, 5 + (i * diff), startVisualisationY + 60, 20, 20);
+    colorInput[i][1].setId(i);
+    colorInput[i][1].setCaptionLabel(""+i);
+    colorInput[i][1].setColorForeground(g);
+    
+    colorInput[i][2] = controlP5.addBang("colorBlue" + i, 5 + (i * diff), startVisualisationY + 100, 20, 20);
+    colorInput[i][2].setId(i);
+    colorInput[i][2].setCaptionLabel(""+i);
+    colorInput[i][2].setColorForeground(b);
   }
 
   // open RS232 Port
@@ -68,11 +96,6 @@ void setup()
 /*  fft.window(FFT.HAMMING);
   windowName = "Hamming";*/
   
-  strechPeak = round((width * 1.0) / fft.specSize());
-  
-  output = new int[NETWORK_SIZE * 4]; // We have three colors in each box available
-  slotsize = round((fft.specSize() * 1.0) / output.length);
-  println("strechPeak = " + strechPeak + "  slotsize = " + slotsize + "   " + (slotsize * strechPeak * output.length) );
 }
 
 
@@ -109,7 +132,7 @@ void draw()
   for(int i = 0; i < fft.specSize(); i++) // shrink spectrum, and use only 80% of the spectrum
   {
     stroke(255);
-      value = ceil(fft.getBand(i) * 8 * (i / 4));
+      value = ceil(fft.getBand(i) * 4 * (i / 4));
 //    value = (int) (fft.getBand(i) * 5);
 //      value = (int) max( ((fft.getBand(i) - 0.54) * 0.4  ) / 80, startVisualisationY);
 //    value = (int) (fft.getBand(i) * (((i * 2 + 1) >> i) ));
@@ -122,6 +145,10 @@ void draw()
       // draw a horizontal line for each slot
       stroke(color(255,0,0));
       line(outi * (slotsize * strechPeak) , startVisualisationY - output[outi], (outi + 1) * (slotsize * strechPeak), startVisualisationY - output[outi]);
+      
+      // draw a vertical line to arrange the input bangs
+      stroke(color(255,255,255));
+      line((outi + 1) * (slotsize * strechPeak) , startVisualisationY, (outi + 1) * (slotsize * strechPeak), height);
 
       if (slomotion) { // only modify the item once
         if (shrinkValue)
