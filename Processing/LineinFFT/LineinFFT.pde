@@ -48,7 +48,7 @@ void setup()
   textFont(createFont("Arial", 16));
 
   windowName = "None";
-  startVisualisationY = height - 200;
+  startVisualisationY = height - 150;
 
   controlP5 = new ControlP5(this);
   for(int i=0; i < NETWORK_SIZE; i++) { 
@@ -68,18 +68,18 @@ void setup()
 /*  fft.window(FFT.HAMMING);
   windowName = "Hamming";*/
   
-  strechPeak = (width * 1.0) / fft.specSize();
+  strechPeak = round((width * 1.0) / fft.specSize());
   
   output = new int[NETWORK_SIZE * 4]; // We have three colors in each box available
-  slotsize = (fft.specSize() * 1.0) / output.length;
+  slotsize = round((fft.specSize() * 1.0) / output.length);
   println("strechPeak = " + strechPeak + "  slotsize = " + slotsize + "   " + (slotsize * strechPeak * output.length) );
 }
 
 
 int[] output;
-float slotsize;
+int slotsize;
 
-float strechPeak;
+int strechPeak;
 int startVisualisationY;
 
 void draw()
@@ -109,10 +109,11 @@ void draw()
   for(int i = 0; i < fft.specSize(); i++) // shrink spectrum, and use only 80% of the spectrum
   {
     stroke(255);
-
-    value = (int) (fft.getBand(i) * 5);
-    //value = (int) max( (((fft.getBand(i) - 0.30 / 10 ) * fft.specSize() / 7 ) + 2) / 2, Integer.MAX_VALUE);
+      value = ceil(fft.getBand(i) * 8 * (i / 4));
+//    value = (int) (fft.getBand(i) * 5);
+//      value = (int) max( ((fft.getBand(i) - 0.54) * 0.4  ) / 80, startVisualisationY);
 //    value = (int) (fft.getBand(i) * (((i * 2 + 1) >> i) ));
+
       
     
     rect(i* strechPeak, startVisualisationY, strechPeak, -value);
@@ -120,7 +121,7 @@ void draw()
     if (i > 0 && i % slotsize == 0) {
       // draw a horizontal line for each slot
       stroke(color(255,0,0));
-      line(outi * (slotsize + strechPeak) , startVisualisationY - output[outi], (outi + 1) * (slotsize + strechPeak), startVisualisationY - output[outi]);
+      line(outi * (slotsize * strechPeak) , startVisualisationY - output[outi], (outi + 1) * (slotsize * strechPeak), startVisualisationY - output[outi]);
 
       if (slomotion) { // only modify the item once
         if (shrinkValue)
@@ -202,7 +203,7 @@ synchronized void sendStringCommandToLightBox(String cmd) {
 int maxValue;
 
 int magic(int number) {
-  //  return (int) (255.0 * number / maxValue);  
-  return number; // No Magic no longer
+  //  return (int) (255.0 * number / maxValue);
+  return number; //TODO No Magic no longer
 }
 
