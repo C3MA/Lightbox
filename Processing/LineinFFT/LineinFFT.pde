@@ -48,10 +48,11 @@ void setup()
   textFont(createFont("Arial", 16));
 
   windowName = "None";
+  startVisualisationY = height - 200;
 
   controlP5 = new ControlP5(this);
   for(int i=0; i < NETWORK_SIZE; i++) { 
-    bang[i] = controlP5.addBang("bang" + i,300 + (i*25), 5,20,20);
+    bang[i] = controlP5.addBang("bang" + i,5 + (i*25), startVisualisationY + 20 ,20,20);
     bang[i].setId(i);
     bang[i].setCaptionLabel(""+i);
     bang[i].setColorForeground(0);
@@ -64,12 +65,17 @@ void setup()
 
   // a Hamming window can be used to shape the sample buffer that is passed to the FFT
   // this can reduce the amount of noise in the spectrum
-  fft.window(FFT.HAMMING);
-  windowName = "Hamming";
+/*  fft.window(FFT.HAMMING);
+  windowName = "Hamming";*/
+  
+  strechPeak = width / fft.specSize();
 }
 
 
-int[] output = new int[NETWORK_SIZE * 3];
+int[] output = new int[NETWORK_SIZE * 3]; // We have three colors in each box available
+
+int strechPeak;
+int startVisualisationY;
 
 void draw()
 {
@@ -105,12 +111,12 @@ void draw()
     value = (int) (fft.getBand(i) * (((i * 2 + 1) >> i) ));
       
     
-    line(i, height, i, height - value);
+    line(i* strechPeak, startVisualisationY, (i + 1)* strechPeak, startVisualisationY - value);
 
     if (i > 0 && i % slotsize == 0) {
       // draw a horizontal line for each slot
       stroke(color(255,0,0));
-      line(outi * slotsize, height - output[outi], (outi + 1) * slotsize, height - output[outi]);
+      line(outi * slotsize , startVisualisationY - output[outi], (outi + 1) * slotsize, startVisualisationY - output[outi]);
 
       if (slomotion) { // only modify the item once
         if (shrinkValue)
