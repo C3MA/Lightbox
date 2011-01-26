@@ -58,11 +58,15 @@ void setup()
 
   windowName = "None";
   startVisualisationY = height - 150;
+  
   final int diff = strechPeak * slotsize;
   final int r = color(255,0,0);
   final int g = color(0,255,0);
   final int b = color(0,0,255);
   
+  // Offset of the leftest input "LED"
+  final int INPUT_OFFSET = 5;
+
   controlP5 = new ControlP5(this);
   for(int i=0; i < NETWORK_SIZE; i++) { 
     bang[i] = controlP5.addBang("bang" + i, 400 + (i*25), 2 ,20,20);
@@ -70,17 +74,17 @@ void setup()
     bang[i].setCaptionLabel(""+i);
     bang[i].setColorForeground(0);
     
-    colorInput[i][0] = controlP5.addBang("colorRed" + i, 5 + (i * diff), startVisualisationY + 20, 20, 20);
+    colorInput[i][0] = controlP5.addBang("colorRed" + i, INPUT_OFFSET + (i * diff), startVisualisationY + 20, 20, 20);
     colorInput[i][0].setId(i);
     colorInput[i][0].setCaptionLabel(""+i);
     colorInput[i][0].setColorForeground(r);
     
-    colorInput[i][1] = controlP5.addBang("colorGreen" + i, 5 + (i * diff), startVisualisationY + 60, 20, 20);
+    colorInput[i][1] = controlP5.addBang("colorGreen" + i, INPUT_OFFSET + (i * diff), startVisualisationY + 60, 20, 20);
     colorInput[i][1].setId(i);
     colorInput[i][1].setCaptionLabel(""+i);
     colorInput[i][1].setColorForeground(g);
     
-    colorInput[i][2] = controlP5.addBang("colorBlue" + i, 5 + (i * diff), startVisualisationY + 100, 20, 20);
+    colorInput[i][2] = controlP5.addBang("colorBlue" + i, INPUT_OFFSET + (i * diff), startVisualisationY + 100, 20, 20);
     colorInput[i][2].setId(i);
     colorInput[i][2].setCaptionLabel(""+i);
     colorInput[i][2].setColorForeground(b);
@@ -180,9 +184,30 @@ void draw()
    sendPWMCommandToLightBox(magic(output[12]), magic(output[14]), 0,   3);
    sendPWMCommandToLightBox(0, magic(output[15]), magic(output[16]), 4);*/
 
+  final int diff = strechPeak * slotsize;
+  float x, y;
+  int r=-1, g=-1, b=-1;
   for(int i=0; i < NETWORK_SIZE; i++) {
-    //    sendPWMCommandToLightBox(0, 0, magic(output[i*2]), i);
-    sendPWMCommandToLightBox(magic(output[i*3 + 0]), magic(output[i*3 + 1]), magic(output[i*3 + 2]), i);
+    
+    // ---- red ----
+    y = colorInput[i][0].position().y;
+    if (y > startVisualisationY) {
+      x = colorInput[i][0].position().x;
+      r = round(x / diff);
+    }
+    // ---- green ----
+    y = colorInput[i][1].position().y;
+    if (y > startVisualisationY) {
+      x = colorInput[i][1].position().x;
+      g = round(x / diff);
+    }
+    // ---- blue ----
+    y = colorInput[i][2].position().y;
+    if (y > startVisualisationY) {
+      x = colorInput[i][2].position().x;
+      b = round(x / diff);
+    }
+    sendPWMCommandToLightBox(magic(r >= 0 ? output[r] : 0), magic(g >= 0 ? output[g] : 0), magic(b >= 0 ? output[b] : 0), i);
   }
 
   fill(255);
