@@ -1,25 +1,19 @@
 // Definition of interrupt names
 #include <avr/io.h>
-// ISR interrupt service routine
-#include <avr/interrupt.h>
 #include <EEPROM.h>
 
 /*
 accepts only messages with the prefix: p and ended with postfix:o
 */
-
 int CMD_MAX = 128;
 char myCmd[128];
 int port;
-
-char booted = 0; // bool variable
 
 int deviceid;
 
 int valueRed = 0;
 int valueGreen = 0;
 int valueBlue = 0;
-int demoMode = 1;
 
 #define MAX_BRIGHT  255
 #define ID_STORE    1    // The address in the EEPROM where the device ID is stored.
@@ -30,57 +24,23 @@ int progModePin = 2;
 // We need to declare the data exchange
 // variable to be volatile - the value is
 // read from memory.
-volatile int programmMode = 0;
-volatile unsigned long programmBtnTimeDown;
-volatile int programmBtnReady = 1;
-
-// Install the interrupt routine.
-/*
-  ISR(INT0_vect) {
-  if (millis() < time + 2000)
-    return;
-    
-  time = millis(); 
-  // someone has pressed the programmer button
-  programmMode = (programmMode) ? 0 : 1;
-  Serial.println(programmMode);
-  
-  if (1 == programmMode) 
-    setLedValues(255, 255, 255);
-  else if (0 == programmMode)
-     setLedValues(0, 0, 0);
-}
-*/
+int programmMode = 0;
+unsigned long programmBtnTimeDown;
+int programmBtnReady = 1;
 
 
 void setup(){
+  resetPorts();
+  
   programmBtnTimeDown = millis(); // initialize time
   deviceid = 1; // Set the device to unknown
-  resetPorts();
   Serial.begin(57600);
-  
-  Serial.println("booted");
-  
-  int test = analogRead(0);
-  randomSeed (test);    // randomize
-  Serial.print("Input: ");
-  Serial.println(test);
   
   // read from the sense pin 
   pinMode(progModePin, INPUT);
   digitalWrite(progModePin, HIGH);
-//  Serial.println("Processing initialization");
-  
+
   deviceid = EEPROM.read(1);
-  Serial.print("read deviceid = ");
-  Serial.println((int)deviceid);
-  
-  //uncomment to enable buttons
-  // Global Enable INT0 interrupt
-  //GICR |= ( 1 << INT0);
-  // Signal change triggers interrupt
-  //MCUCR |= ( 0 << ISC00);
-  //MCUCR |= ( 1 << ISC01);
 }
 
 void resetPorts()
@@ -88,10 +48,10 @@ void resetPorts()
   pinMode(9, OUTPUT);
   pinMode(10, OUTPUT);
   pinMode(11, OUTPUT);
-   
-  analogWrite(9, 10);
+  
+  analogWrite(9, 100);
   analogWrite(10, 100);
-  analogWrite(11, 255);
+  analogWrite(11, 5);
 }
 
 void clearCmdArray(){
@@ -125,8 +85,6 @@ int readFromSerialIntoCmdArray(){
   //there are 11 or more than 11 bytes ready to be read
   
   if(inputSize > 0 && inputSize < CMD_MAX){
-    //Serial.print("inputSize: ");
-    //Serial.println(inputSize);
     for (int i = 0; i < inputSize; i++){
       myCmd[i] = Serial.read();
       if(myCmd[i] == 'o')
@@ -134,7 +92,6 @@ int readFromSerialIntoCmdArray(){
     }
   }else if(inputSize >= CMD_MAX){
    Serial.flush();
-     Serial.println("too much data, flush");
   }
   return -1;
 }
@@ -148,21 +105,9 @@ int checkCmdArrayForPrefix(){
   return 0;
 }
 
-void sendAckOverSerial(){
-  Serial.println("ACK");
-}
-
-void sendNackOverSerial(){
-  Serial.println("NACK");
-}
-
-void sendPingAckOverSerial(){
-  Serial.println("PACK");
-}
-
 void loop()
 {
-    
+  
   if(digitalRead(progModePin) == LOW){
     if(programmBtnTimeDown == 0 && programmBtnReady == 1){
       programmBtnTimeDown = millis();
@@ -188,18 +133,11 @@ void loop()
     programmBtnTimeDown = 0;
   }
   
-  
-  
   clearCmdArray();
  
   int inputSize = readFromSerialIntoCmdArray();
   if(inputSize != 11)
     return;
-    
-    
-    //debug
-    //Serial.print("receiced: ");
-    //Serial.println(myCmd);
     
     int checkCmd = checkCmdArrayForPrefix();
     if(checkCmd == 0){
@@ -207,8 +145,6 @@ void loop()
        return; 
     }
    
-    // deactivate Demomode
-    demoMode = 0;
     
     //check for write command
     if (myCmd[1] == 'w')
@@ -219,15 +155,6 @@ void loop()
         int green = decodeHex(myCmd[4], myCmd[5]);
         int blue = decodeHex(myCmd[6], myCmd[7]);
         int id = decodeHex(myCmd[8], myCmd[9]);
-     
-        /*Serial.print("red:");
-        Serial.println(red);
-        Serial.print("green:");
-        Serial.println(green);
-        Serial.print("blue:");
-        Serial.println(blue);
-        Serial.print("id:");
-        Serial.println(id);*/
         
         if(id == deviceid)
         {
@@ -263,49 +190,17 @@ void loop()
        //Serial.print("read newdeviceid = ");
        //Serial.println((int)newdeviceid);
            
-      } else { // No programm mode
-        Serial.print("NACK");
+      } else { 
+        // No programming mode
+        //do nothing
       }
-    }
-    else if(myCmd[5] == 'h'  //not working right now
-            && myCmd[6] == 'e' 
-            && myCmd[7] == 'l' 
-            && myCmd[8] == 'p')
-    {
-      if(programmMode) return;
-       sendHelpOverSerial();
-    }
-    //check for ping command, not working right now
-    else if(myCmd[5] == 'd' 
-            && myCmd[6] == 'e' 
-            && myCmd[7] == 'm' 
-            && myCmd[8] == 'o')
-    {
-      if(programmMode) return;
-      demoMode = 1;
-      Serial.print("ACK");
     }
     else
     {
-      //no write command
-       //sendNackOverSerial(); 
+      //no valid command
+      //do nothing
     }
-    
-    //Serial.write(myCmd);   
 }
-
-void sendHelpOverSerial()
-{
-  Serial.println("----help is coming----");
-  Serial.println("all commands must be prefixed with \"ollpe\"");
-  Serial.println("----commands----");
-  Serial.println("wAABBCC01\t set pwm [red][green][blue][id] (Hex)");
-  Serial.println("ping\t returns \"PACK\"");
-  Serial.println("demo\t starts a demo mode");
-  Serial.println("help\t prints this help");
-  Serial.println("----help end----");
-}
-
 
 int decodeValue(char* c)
 {

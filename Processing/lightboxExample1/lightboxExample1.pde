@@ -21,7 +21,7 @@ DemoThread demoThread;
 //bangs are used to simulate the lightboxes
 Bang[] bang = new Bang[255];
 
-int NETWORK_SIZE = 3;
+int NETWORK_SIZE = 6;
 
 void setup() {
   size(640,480);
@@ -57,15 +57,16 @@ void setup() {
   tmpB.setCaptionLabel("set colorpicker values");
 
   //addd the sliders
-  sliderDelay = controlP5.addSlider("sliderDelay",1,1000,300, 250,20,100,20);
+  sliderDelay = controlP5.addSlider("sliderDelay",1,1000,300, 250,20,300,20);
   sliderDelay.setCaptionLabel("delay");
-  sliderDuration = controlP5.addSlider("sliderDuration",1,500,20, 250,60,100,20);
+  sliderDuration = controlP5.addSlider("sliderDuration",1,500,20, 250,60,300,20);
   sliderDuration.setCaptionLabel("duration");
   
   //add the colorpicker
   colorpicker = controlP5.addColorPicker("colorpicker",300,100,255,30);
   
   String portName = Serial.list()[0];
+  println(portName);
   myPort = new Serial(this, portName, 57600);
 }
 
@@ -209,13 +210,19 @@ class DemoB extends DemoThread {
         while(true){
           flashTime = (int)sliderDuration.value();
           delayTime = (int)sliderDelay.value();
-          sendPWMCommandToLightBox(0,0,0,1);
+          for(int i=0; i < NETWORK_SIZE; i++) {          
+            sendPWMCommandToLightBox(0,0,0,i);
+          }
           delay(delayTime);
           color c = colorpicker.getColorValue();
+          for(int i=0; i < NETWORK_SIZE; i++) {          
             sendPWMCommandToLightBox((int)red(c),
                                      (int)green(c),
                                      (int)blue(c),
-                                     1);
+                                     i);
+          }
+          
+            
           delay(flashTime);
           checkEnd();
         }
