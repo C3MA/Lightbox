@@ -69,7 +69,7 @@ void setup()
 
   controlP5 = new ControlP5(this);
   for(int i=0; i < NETWORK_SIZE; i++) { 
-    bang[i] = controlP5.addBang("bang" + i, 400 + (i*25), 2 ,20,20);
+    bang[i] = controlP5.addBang("bang" + i, 640 + (i*25), 2 ,20,20);
     bang[i].setId(i);
     bang[i].setCaptionLabel(""+i);
     bang[i].setColorForeground(0);
@@ -97,8 +97,8 @@ void setup()
 
   // a Hamming window can be used to shape the sample buffer that is passed to the FFT
   // this can reduce the amount of noise in the spectrum
-/*  fft.window(FFT.HAMMING);
-  windowName = "Hamming";*/
+  fft.window(FFT.HAMMING);
+  windowName = "Hamming";
   
 }
 
@@ -152,7 +152,7 @@ void draw()
       
       // draw a vertical line to arrange the input bangs
       stroke(color(255,255,255));
-      line((outi + 1) * (slotsize * strechPeak) , startVisualisationY, (outi + 1) * (slotsize * strechPeak), height);
+      line((outi + 1) * (slotsize * strechPeak) , 0, (outi + 1) * (slotsize * strechPeak), height);
 
       if (slomotion) { // only modify the item once
         if (shrinkValue)
@@ -188,31 +188,31 @@ void draw()
   float x, y;
   int r=-1, g=-1, b=-1;
   for(int i=0; i < NETWORK_SIZE; i++) {
-    
     // ---- red ----
     y = colorInput[i][0].position().y;
-    if (y > startVisualisationY) {
+    if (y < startVisualisationY) {
       x = colorInput[i][0].position().x;
       r = round(x / diff);
     }
     // ---- green ----
     y = colorInput[i][1].position().y;
-    if (y > startVisualisationY) {
+    if (y < startVisualisationY) {
       x = colorInput[i][1].position().x;
       g = round(x / diff);
     }
     // ---- blue ----
     y = colorInput[i][2].position().y;
-    if (y > startVisualisationY) {
+    if (y < startVisualisationY) {
       x = colorInput[i][2].position().x;
       b = round(x / diff);
     }
     sendPWMCommandToLightBox(magic(r >= 0 ? output[r] : 0), magic(g >= 0 ? output[g] : 0), magic(b >= 0 ? output[b] : 0), i);
+    r=-1; g=-1; b=-1;
   }
 
   fill(255);
   // keep us informed about the window being used
-  text("The window being used is: " + windowName, 5, 20);
+  text("The window being used is: " + windowName + ".    Drag the colors from each box over the sectrum.", 5, 20);
 }
 
 void keyReleased()
@@ -249,7 +249,7 @@ synchronized void sendPWMCommandToLightBox(int r, int g, int b, int id) {
 
 synchronized void sendStringCommandToLightBox(String cmd) {
   myPort.write(cmd);
-//  println(cmd);
+  println(cmd);
 }
 
 int maxValue;
