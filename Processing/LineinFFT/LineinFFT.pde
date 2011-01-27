@@ -28,7 +28,29 @@ Bang[][] colorInput = new Bang[NETWORK_SIZE][3]; // for each node and each color
 
 boolean slomotion = false;
 
-PrintWriter outputPositions;
+public void readSettings(String file) { 
+  BufferedReader reader;
+  
+  if (file == null)
+    reader = createReader(getDefaultFile());
+  else
+     reader = createReader(file);
+     
+  String line;
+  try {
+    while ((line = reader.readLine()) != null) {
+        String[] pieces = split(line, TAB);
+        // Example line:
+        //0       5.0 470.0       5.0 510.0       5.0 550.0
+        int x = int(pieces[0]);
+        int y = int(pieces[1]);
+    
+    }
+  } catch (IOException e) {
+    e.printStackTrace();
+    line = null;
+  }
+}
 
 void setup()
 {
@@ -51,7 +73,6 @@ void setup()
 
   textFont(createFont("Arial", 16));
   
-  
   strechPeak = round((width * 1.0) / fft.specSize());
   
   output = new int[NETWORK_SIZE * 4]; // We have three colors in each box available
@@ -69,7 +90,7 @@ void setup()
   final int INPUT_OFFSET = 5;
 
   controlP5 = new ControlP5(this);
-  for(int i=0; i < NETWORK_SIZE; i++) { 
+  for(int i=0; i < NETWORK_SIZE; i++) {
     bang[i] = controlP5.addBang("bang" + i, 640 + (i*25), 2 ,20,20);
     bang[i].setId(i);
     bang[i].setCaptionLabel(""+i);
@@ -216,6 +237,14 @@ void draw()
   text("The window being used is: " + windowName + ".    Drag the colors from each box over the sectrum.", 5, 20);
 }
 
+
+public String getDefaultFile() {
+  String output = System.getProperty("user.home");
+  output += "/.c3maLb";
+  output += "/positions.txt";
+  return output;
+}
+
 void keyReleased()
 {  
   if ( key == 's' )
@@ -228,30 +257,35 @@ void keyReleased()
   }
   else if ( key == 'w' ) // Write the actual position into a configuration file
   {
-    String output = System.getProperty("user.home");
-    output += "/.c3maLb";
-    
-    // create folder
-    new File(output).mkdir();
-    
-    println("Homefolder : " + output);
-    
-    outputPositions = createWriter(output + "/positions.txt");
-    
-    float y, x;
-    for(int i=0; i < NETWORK_SIZE; i++) {
-      outputPositions.print(""+i);
-      for(int j=0; j < 3; j++) { // store each color
-        y = colorInput[i][j].position().y;
-        x = colorInput[i][j].position().x;
-        outputPositions.print("\t" + x + " " + y);
-      }
-      outputPositions.println();
-    }
-    outputPositions.flush(); // Writes the remaining data to the file
-    outputPositions.close(); // Finishes the file
+    writeSettings();
   }
   
+}
+
+public void writeSettings() {
+  String output = System.getProperty("user.home");
+  output += "/.c3maLb";
+  
+  // create folder
+  new File(output).mkdir();
+  
+  println("Homefolder : " + output);
+  
+  PrintWriter outputPositions;
+  outputPositions = createWriter(getDefaultFile());
+  
+  float y, x;
+  for(int i=0; i < NETWORK_SIZE; i++) {
+    outputPositions.print(""+i);
+    for(int j=0; j < 3; j++) { // store each color
+      y = colorInput[i][j].position().y;
+      x = colorInput[i][j].position().x;
+      outputPositions.print("\t" + x + " " + y);
+    }
+    outputPositions.println();
+  }
+  outputPositions.flush(); // Writes the remaining data to the file
+  outputPositions.close(); // Finishes the file 
 }
 
 void stop()
