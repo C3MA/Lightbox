@@ -28,6 +28,7 @@ Bang[][] colorInput = new Bang[NETWORK_SIZE][3]; // for each node and each color
 
 boolean slomotion = false;
 
+PrintWriter outputPositions;
 
 void setup()
 {
@@ -225,6 +226,32 @@ void keyReleased()
     else
       windowName = "Hamming";
   }
+  else if ( key == 'w' ) // Write the actual position into a configuration file
+  {
+    String output = System.getProperty("user.home");
+    output += "/.c3maLb";
+    
+    // create folder
+    new File(output).mkdir();
+    
+    println("Homefolder : " + output);
+    
+    outputPositions = createWriter(output + "/positions.txt");
+    
+    float y, x;
+    for(int i=0; i < NETWORK_SIZE; i++) {
+      outputPositions.print(""+i);
+      for(int j=0; j < 3; j++) { // store each color
+        y = colorInput[i][j].position().y;
+        x = colorInput[i][j].position().x;
+        outputPositions.print("\t" + x + " " + y);
+      }
+      outputPositions.println();
+    }
+    outputPositions.flush(); // Writes the remaining data to the file
+    outputPositions.close(); // Finishes the file
+  }
+  
 }
 
 void stop()
