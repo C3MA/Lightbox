@@ -1,25 +1,19 @@
 // Definition of interrupt names
 #include <avr/io.h>
-// ISR interrupt service routine
-#include <avr/interrupt.h>
 #include <EEPROM.h>
 
 /*
 accepts only messages with the prefix: p and ended with postfix:o
 */
-
 int CMD_MAX = 128;
 char myCmd[128];
 int port;
-
-char booted = 0; // bool variable
 
 int deviceid;
 
 int valueRed = 0;
 int valueGreen = 0;
 int valueBlue = 0;
-int demoMode = 1;
 
 #define MAX_BRIGHT  255
 #define ID_STORE    1    // The address in the EEPROM where the device ID is stored.
@@ -30,6 +24,7 @@ int progModePin = 2;
 // We need to declare the data exchange
 // variable to be volatile - the value is
 // read from memory.
+<<<<<<< HEAD
 volatile int programmMode = 0;
 volatile unsigned long time;
 
@@ -53,10 +48,21 @@ ISR(INT0_vect) {
 void setup(){
   deviceid = EEPROM.read(1);
   time = millis(); // initialize time
-  deviceid = 1; // Set the device to unknown
+=======
+int programmMode = 0;
+unsigned long programmBtnTimeDown;
+int programmBtnReady = 1;
+
+
+void setup(){
   resetPorts();
+  
+  programmBtnTimeDown = millis(); // initialize time
+>>>>>>> d797c9e6734f222e11dc5211d8e7f733bc931e38
+  deviceid = 1; // Set the device to unknown
   Serial.begin(57600);
   
+<<<<<<< HEAD
   Serial.println("booted");
   
   int test = analogRead(0);
@@ -75,6 +81,13 @@ void setup(){
   // Signal change triggers interrupt
   MCUCR |= ( 1 << ISC00);
   MCUCR |= ( 0 << ISC01);
+=======
+  // read from the sense pin 
+  pinMode(progModePin, INPUT);
+  digitalWrite(progModePin, HIGH);
+
+  deviceid = EEPROM.read(1);
+>>>>>>> d797c9e6734f222e11dc5211d8e7f733bc931e38
 }
 
 void resetPorts()
@@ -82,10 +95,10 @@ void resetPorts()
   pinMode(9, OUTPUT);
   pinMode(10, OUTPUT);
   pinMode(11, OUTPUT);
-   
-  analogWrite(9, 10);
+  
+  analogWrite(9, 100);
   analogWrite(10, 100);
-  analogWrite(11, 255);
+  analogWrite(11, 5);
 }
 
 void clearCmdArray(){
@@ -119,8 +132,11 @@ int readFromSerialIntoCmdArray(){
   //there are 11 or more than 11 bytes ready to be read
   
   if(inputSize > 0 && inputSize < CMD_MAX){
+<<<<<<< HEAD
     Serial.print("inputSize: ");
     Serial.println(inputSize);
+=======
+>>>>>>> d797c9e6734f222e11dc5211d8e7f733bc931e38
     for (int i = 0; i < inputSize; i++){
       myCmd[i] = Serial.read();
       if(myCmd[i] == 'o')
@@ -128,7 +144,6 @@ int readFromSerialIntoCmdArray(){
     }
   }else if(inputSize >= CMD_MAX){
    Serial.flush();
-     Serial.println("too much data, flush");
   }
   return -1;
 }
@@ -142,20 +157,9 @@ int checkCmdArrayForPrefix(){
   return 0;
 }
 
-void sendAckOverSerial(){
-  Serial.println("ACK");
-}
-
-void sendNackOverSerial(){
-  Serial.println("NACK");
-}
-
-void sendPingAckOverSerial(){
-  Serial.println("PACK");
-}
-
 void loop()
 {
+<<<<<<< HEAD
     
 /*  long test = random (1, 80000);
   Serial.print("Test Random: ");
@@ -176,6 +180,33 @@ void loop()
     valueBlue = valueBlue % MAX_BRIGHT;
     setLedValues(valueRed, valueGreen, valueBlue);
   }*/
+=======
+  
+  if(digitalRead(progModePin) == LOW){
+    if(programmBtnTimeDown == 0 && programmBtnReady == 1){
+      programmBtnTimeDown = millis();
+      programmBtnReady = 0;
+      //setLedValues(100, 0, 0);
+    }
+  }else{
+    programmBtnTimeDown = 0;
+    programmBtnReady = 1;
+    //setLedValues(0, 0, 50);
+  }
+  
+  if(programmBtnTimeDown > 0 
+      && millis() > programmBtnTimeDown + 500 ){
+    // someone has pressed the programmer button for 500ms
+    programmMode = (programmMode) ? 0 : 1;
+    
+    if (1 == programmMode) 
+      setLedValues(255, 255, 255);
+    else if (0 == programmMode)
+       setLedValues(0, 0, 0);
+       
+    programmBtnTimeDown = 0;
+  }
+>>>>>>> d797c9e6734f222e11dc5211d8e7f733bc931e38
   
   clearCmdArray();
  
@@ -183,19 +214,20 @@ void loop()
   if(inputSize != 11)
     return;
     
+<<<<<<< HEAD
     
     //debug
     Serial.print("receiced: ");
     Serial.println(myCmd);
     
+=======
+>>>>>>> d797c9e6734f222e11dc5211d8e7f733bc931e38
     int checkCmd = checkCmdArrayForPrefix();
     if(checkCmd == 0){
        //Serial.println("if you dont know what to do type \"ollpehelp\"");
        return; 
     }
    
-    // deactivate Demomode
-    demoMode = 0;
     
     //check for write command
     if (myCmd[1] == 'w')
@@ -206,15 +238,6 @@ void loop()
         int green = decodeHex(myCmd[4], myCmd[5]);
         int blue = decodeHex(myCmd[6], myCmd[7]);
         int id = decodeHex(myCmd[8], myCmd[9]);
-     
-        /*Serial.print("red:");
-        Serial.println(red);
-        Serial.print("green:");
-        Serial.println(green);
-        Serial.print("blue:");
-        Serial.println(blue);
-        Serial.print("id:");
-        Serial.println(id);*/
         
         if(id == deviceid)
         {
@@ -243,49 +266,17 @@ void loop()
        delay(500);
        setLedValues(0, 0, 0);
            
-      } else { // No programm mode
-        Serial.print("NACK");
+      } else { 
+        // No programming mode
+        //do nothing
       }
-    }
-    else if(myCmd[5] == 'h'  //not working right now
-            && myCmd[6] == 'e' 
-            && myCmd[7] == 'l' 
-            && myCmd[8] == 'p')
-    {
-      if(programmMode) return;
-       sendHelpOverSerial();
-    }
-    //check for ping command, not working right now
-    else if(myCmd[5] == 'd' 
-            && myCmd[6] == 'e' 
-            && myCmd[7] == 'm' 
-            && myCmd[8] == 'o')
-    {
-      if(programmMode) return;
-      demoMode = 1;
-      Serial.print("ACK");
     }
     else
     {
-      //no write command
-       //sendNackOverSerial(); 
+      //no valid command
+      //do nothing
     }
-    
-    //Serial.write(myCmd);   
 }
-
-void sendHelpOverSerial()
-{
-  Serial.println("----help is coming----");
-  Serial.println("all commands must be prefixed with \"ollpe\"");
-  Serial.println("----commands----");
-  Serial.println("wAABBCC01\t set pwm [red][green][blue][id] (Hex)");
-  Serial.println("ping\t returns \"PACK\"");
-  Serial.println("demo\t starts a demo mode");
-  Serial.println("help\t prints this help");
-  Serial.println("----help end----");
-}
-
 
 int decodeValue(char* c)
 {
