@@ -13,7 +13,7 @@ ControlP5 controlP5;
 
 import processing.serial.*;
 Serial myPort;
- 
+Slider sliderGain;
 Minim minim;
 AudioInput in;
 FFT fft;
@@ -24,7 +24,9 @@ Bang[] bang = new Bang[255];
 
 boolean slomotion = false;
 
-int NETWORK_SIZE = 5;
+int NETWORK_SIZE = 6;
+ 
+float gain = 15.0;
  
 void setup()
 {
@@ -56,14 +58,15 @@ void setup()
     bang[i].setCaptionLabel(""+i);
     bang[i].setColorForeground(0);
   }
-  
+  /*sliderGain = controlP5.addSlider("sliderGain",0,500,1, 50,50,200,20);
+  gain=(float)sliderGain.value();*/
   // open RS232 Port
   String portName = Serial.list()[0];
   myPort = new Serial(this, portName, 57600);
 }
  
  
-int[] output = new int[20];
+int[] output = new int[13];
   
 void draw()
 {
@@ -121,11 +124,24 @@ void draw()
   }
   
   // Display the combined values
-  sendPWMCommandToLightBox(0, magic(output[2]), magic(output[0]),   0);
-  sendPWMCommandToLightBox(0, magic(output[6]), magic(output[4]),  1);
-    sendPWMCommandToLightBox(magic(output[8]), 0, magic(output[10]), 2);
-  sendPWMCommandToLightBox(magic(output[12]), magic(output[14]), 0,   3);
-  sendPWMCommandToLightBox(0, magic(output[15]), magic(output[16]), 4);
+  //RGB
+  float x0=0.05;
+  float x2=0.5;
+  float x4=3;
+  float x6=10;
+  float x8=10;
+  float x10=20;
+  float x12=40;
+  int y1=50;
+  int y2=50;
+  int y3=50;
+  int y4=50;
+  sendPWMCommandToLightBox(0, int(magic(output[0])*x0), 0,   0);
+  sendPWMCommandToLightBox(0, int((magic(output[2])*x2*y1)/100), int((magic(output[2])*x2*y2)/100),  1);
+  sendPWMCommandToLightBox(0, 0, int(magic(output[4])*x4), 2);
+  sendPWMCommandToLightBox(0, 0, int(magic(output[8])*x8), 3);
+  sendPWMCommandToLightBox(int((magic(output[10])*x10*y3)/100), int((magic(output[10])*x10*y4)/100), 0, 4);
+  sendPWMCommandToLightBox(int(magic(output[12])*x12), 0, 0, 5);
     
   fill(255);
   // keep us informed about the window being used
@@ -187,5 +203,5 @@ int maxValue;
 
 int magic(int number) {
 //  return (int) (255.0 * number / maxValue);  
-  return number; // No Magic no longer
+  return (int) (number*gain); // No Magic no longer
 }

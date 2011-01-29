@@ -21,7 +21,7 @@ DemoThread demoThread;
 //bangs are used to simulate the lightboxes
 Bang[] bang = new Bang[255];
 
-int NETWORK_SIZE = 3;
+int NETWORK_SIZE = 6;
 
 void setup() {
   size(640,480);
@@ -52,7 +52,9 @@ void setup() {
   tmpB = controlP5.addButton("demoC"     ,0,20,150,80,19);
   tmpB.setCaptionLabel("start DemoC");
   tmpB = controlP5.addButton("demoD"     ,0,20,175,80,19);
-  tmpB.setCaptionLabel("start DemoD");  
+  tmpB.setCaptionLabel("start DemoD");
+  tmpB = controlP5.addButton("demoRGB"     ,0,20,200,80,19);
+  tmpB.setCaptionLabel("start demoRGB");   
   tmpB = controlP5.addButton("demoColorPicker", 0,120,100,140,19);
   tmpB.setCaptionLabel("set colorpicker values");
 
@@ -108,6 +110,12 @@ public void demoC(int theValue) {
 public void demoD(int theValue) {
   tellOldThreadToKillItself();
   demoThread = new DemoD();
+  demoThread.start();
+}
+
+public void demoRGB(int theValue) {
+  tellOldThreadToKillItself();
+  demoThread = new DemoRGB();
   demoThread.start();
 }
 
@@ -307,6 +315,61 @@ class DemoColorPicker extends DemoThread {
           }
           delay(delayMS);
           checkEnd();
+        }
+      } catch (Exception e){
+        return;
+      }
+    }
+}
+
+class DemoRGB extends DemoThread {
+    public void run() {
+      try{
+        int delayMS = 0;
+        int colorValue = 0;
+        int rcolor = 0;
+        int gcolor = 0;
+        int bcolor = 0;
+        while(true) {
+          delayMS = (int)((int)sliderDelay.value()/10);
+          for(int n=0; n < NETWORK_SIZE; n++) {
+          for(int i=0; i<255;i++){
+           rcolor = i;  
+             sendPWMCommandToLightBox(rcolor,0,0,n);
+           delay(delayMS);
+          } 
+          for(int i=255;i>0;i--){
+           rcolor = i;
+           sendPWMCommandToLightBox(rcolor,0,0,n);
+           delay(delayMS);
+          }
+          checkEnd(); 
+          for(int i=0; i<255;i++){
+           gcolor = i;
+           sendPWMCommandToLightBox(0,gcolor,0,n);
+           delay(delayMS);
+          }
+          checkEnd();
+          for(int i=255; i>0;i--){
+           gcolor = i;
+           sendPWMCommandToLightBox(0,gcolor,0,n);
+           delay(delayMS);
+          }
+          checkEnd(); 
+          for(int i=0; i<255;i++){
+           bcolor = i;
+           sendPWMCommandToLightBox(0,0,bcolor,n);
+           delay(delayMS);
+          }
+          checkEnd(); 
+          for(int i=255; i>0;i--){
+           bcolor = i;
+           sendPWMCommandToLightBox(0,0,bcolor,n);
+           delay(delayMS);
+          }
+          delay(delayMS);
+          checkEnd();
+          } 
         }
       } catch (Exception e){
         return;
