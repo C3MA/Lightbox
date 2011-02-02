@@ -21,7 +21,9 @@ DemoThread demoThread;
 //bangs are used to simulate the lightboxes
 Bang[] bang = new Bang[255];
 
-int NETWORK_SIZE = 6;
+int NETWORK_SIZE = 7;
+boolean masterBox = false ;
+int boxTypeOut = 0;  // If not select, Box is Slave
 
 void setup() {
   size(640,480);
@@ -29,7 +31,7 @@ void setup() {
   frameRate(25);
   
   controlP5 = new ControlP5(this);
-  
+ 
   for(int i=0; i < NETWORK_SIZE; i++){ 
     bang[i] = controlP5.addBang("bang" + i,100 + (i*25),250,20,20);
     bang[i].setId(i);
@@ -41,9 +43,17 @@ void setup() {
   myTextfield.setCaptionLabel("input ID here and press ENTER so send");
   myTextfield.setFocus(true);
   
+  //add CheckBox for Master-Slave-Selection
+  CheckBox selectMaSl;
+  selectMaSl = controlP5.addCheckBox("selectMaSl",20,50);
+  selectMaSl.addItem("Select Master-Box",0);
+  selectMaSl.setColorForeground(color(120));
+  selectMaSl.setColorActive(color(255));
+  selectMaSl.setColorLabel(color(255));
+  
   //add the buttons to the screen
   Button tmpB;
-  tmpB = controlP5.addButton("buttonStop",0,20,50,80,19);
+  tmpB = controlP5.addButton("buttonStop",0,20,75,80,19);
   tmpB.setCaptionLabel("stop demos");
   tmpB = controlP5.addButton("demoA"     ,0,20,100,80,19);
   tmpB.setCaptionLabel("start DemoA");
@@ -84,9 +94,26 @@ void stop()
   super.stop();
 }
 
+
 public void controlEvent(ControlEvent theEvent) {
-  println(theEvent.controller().name());
+    if(theEvent.isGroup()) {
+      selectMaSl();
+       }
+ }
+
+ //toggel masterBox, if masterBox == true, set boxTypeOut = 1 (Master-Box)
+ //if masterBox == false, set boxTypeOut = 0 (Slave-Box)
+public void selectMaSl(){
+  masterBox = !masterBox;
+  if (masterBox == true){
+   boxTypeOut = 1;
+   }
+   else{
+   boxTypeOut = 0;
+   }  
+  println("Masterbox "+masterBox);
 }
+
 
 public void demoA(int theValue) {
   tellOldThreadToKillItself();
@@ -138,9 +165,9 @@ void tellOldThreadToKillItself(){
 public void texting(String theText) {
   // receiving text from controller texting
   println("a textfield event for controller 'texting': "+theText);
+  int deviceId = Integer.parseInt(theText);
+  sendInit(deviceId, boxTypeOut);
   
-  int deviceId = Integer.parseInt(theText); 
-  sendInit(deviceId);  
 }
 
 synchronized void sendPWMCommandToLightBox(int r, int g, int b, int id){
@@ -154,11 +181,11 @@ synchronized void sendPWMCommandToLightBox(int r, int g, int b, int id){
   sendStringCommandToLightBox(command);
 }
 
-synchronized void sendInit(int id){
+synchronized void sendInit(int id, int typ){
   String command = "pi";
   command += hex(0,2); // stuffing bytes
   command += hex(0,2); // stuffing bytes
-  command += hex(0,2); // stuffing bytes
+  command += hex(typ,2); // Master-Slave-Box-Selection 00=Slave-Box 01=Master-Box
   command += hex(id,2); // the id that should be set.
   command += "o";
   sendStringCommandToLightBox(command);
