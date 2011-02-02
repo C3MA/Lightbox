@@ -23,7 +23,7 @@ Bang[] bang = new Bang[255];
 
 int NETWORK_SIZE = 7;
 boolean masterBox = false ;
-int boxTypeOut = 0;  // If not select, Box is Slave
+int boxTypOut = 0;
 
 void setup() {
   size(640,480);
@@ -101,15 +101,13 @@ public void controlEvent(ControlEvent theEvent) {
        }
  }
 
- //toggel masterBox, if masterBox == true, set boxTypeOut = 1 (Master-Box)
- //if masterBox == false, set boxTypeOut = 0 (Slave-Box)
 public void selectMaSl(){
   masterBox = !masterBox;
   if (masterBox == true){
-   boxTypeOut = 1;
+   boxTypOut = 1;
    }
    else{
-   boxTypeOut = 0;
+   boxTypOut = 0;
    }  
   println("Masterbox "+masterBox);
 }
@@ -166,7 +164,7 @@ public void texting(String theText) {
   // receiving text from controller texting
   println("a textfield event for controller 'texting': "+theText);
   int deviceId = Integer.parseInt(theText);
-  sendInit(deviceId, boxTypeOut);
+  sendInit(deviceId, boxTypOut);
   
 }
 
