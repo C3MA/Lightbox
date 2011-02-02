@@ -10,6 +10,7 @@ char myCmd[128];
 int port;
 
 int deviceid;
+int boxtype;
 
 int valueRed = 0;
 int valueGreen = 0;
@@ -20,6 +21,8 @@ int valueBlue = 0;
 
 // This is the INT0 Pin of the ATMega8
 int progModePin = 2;
+// Pin for Master-Slave-Select
+int boxTypeSelect = 3;
 
 // We need to declare the data exchange
 // variable to be volatile - the value is
@@ -34,13 +37,16 @@ void setup(){
   
   programmBtnTimeDown = millis(); // initialize time
   deviceid = 1; // Set the device to unknown
+  boxtype = 0;
   Serial.begin(57600);
   
   // read from the sense pin 
   pinMode(progModePin, INPUT);
+  pinMode (boxTypeSelect, OUTPUT);
   digitalWrite(progModePin, HIGH);
 
   deviceid = EEPROM.read(1);
+  boxtype = EEPROM.read(3);
 }
 
 void resetPorts()
@@ -49,9 +55,9 @@ void resetPorts()
   pinMode(10, OUTPUT);
   pinMode(11, OUTPUT);
   
-  analogWrite(9, 100);
-  analogWrite(10, 100);
-  analogWrite(11, 5);
+  analogWrite(9, 0);
+  analogWrite(10, 128);
+  analogWrite(11,0 );
 }
 
 void clearCmdArray(){
@@ -59,6 +65,14 @@ void clearCmdArray(){
   for (int i = 0; i < CMD_MAX; i++){
     myCmd[i] = '\0';
   }
+}
+
+void boxType(){
+if(1 == boxtype){
+digitalWrite(boxTypeSelect, HIGH);
+} else {
+  digitalWrite(boxTypeSelect, LOW);
+}
 }
 
 void setLedValues(int r, int g, int b)
@@ -122,10 +136,12 @@ void loop()
   
   if(programmBtnTimeDown > 0 
       && millis() > programmBtnTimeDown + 500 ){
+    digitalWrite(boxTypeSelect, HIGH);
     // someone has pressed the programmer button for 500ms
     programmMode = (programmMode) ? 0 : 1;
     
-    if (1 == programmMode) 
+    if (1 == programmMode)
+    
       setLedValues(255, 255, 255);
     else if (0 == programmMode)
        setLedValues(0, 0, 0);
@@ -169,9 +185,14 @@ void loop()
        //set the id and save in eeprom
        byte newdeviceid = decodeHex(myCmd[8], myCmd[9]);
        deviceid = newdeviceid;
+       byte newboxtype = decodeHex(myCmd[6], myCmd[7]);
+       boxtype = newboxtype;
        //Serial.print("newdeviceid = ");
        //Serial.println((int)newdeviceid);
        EEPROM.write(1, newdeviceid);
+       EEPROM.write(3, newboxtype);
+       
+       boxType();
        
        programmMode = 0;
        //Serial.print("NACK");
@@ -187,6 +208,7 @@ void loop()
        
        //EEPROM.write(1, newdeviceid);
        newdeviceid = EEPROM.read(1);
+       newboxtype = EEPROM.read(3);
        //Serial.print("read newdeviceid = ");
        //Serial.println((int)newdeviceid);
            
