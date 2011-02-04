@@ -42,14 +42,32 @@ public void readSettings(String file) {
         String[] pieces = split(line, TAB);
         // Example line:
         //0       5.0 470.0       5.0 510.0       5.0 550.0
-        int x = int(pieces[0]);
-        int y = int(pieces[1]);
-    
+        if (pieces.length < 4)
+          continue;
+        int position = int(pieces[0]);
+        
+        CVector3f r = extractPosition(pieces[1]);
+        CVector3f g = extractPosition(pieces[2]);
+        CVector3f b = extractPosition(pieces[3]);
+        
+        colorInput[position][0].position().x = r.x;
+        colorInput[position][0].position().y = r.y;
+        colorInput[position][1].position().x = g.x;
+        colorInput[position][1].position().y = g.y;
+        colorInput[position][2].position().x = b.x;
+        colorInput[position][2].position().y = b.y;      
     }
   } catch (IOException e) {
     e.printStackTrace();
     line = null;
   }
+}
+
+CVector3f extractPosition(String element) {
+  String[] t = split(element, " ");
+  if (t.length != 2)
+    return null;
+  return new CVector3f(float(t[0]), float(t[1]), 0f); 
 }
 
 void setup()
@@ -122,6 +140,7 @@ void setup()
   fft.window(FFT.HAMMING);
   windowName = "Hamming";
   
+  readSettings(null);
 }
 
 
