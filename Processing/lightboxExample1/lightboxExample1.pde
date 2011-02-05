@@ -33,7 +33,11 @@ void setup() {
   
   controlP5 = new ControlP5(this);
  
+<<<<<<< HEAD
   for(int i=0; i < NETWORK_SIZE; i++){
+=======
+  for(int i=0; i < NETWORK_SIZE; i++){ 
+>>>>>>> eb3f3ad9d7ba757cccad967ab5b8c35d5878daba
     bang[i] = controlP5.addBang("bang" + i,100 + (i*25),250,20,20);
     bang[i].setId(i);
     bang[i].setCaptionLabel(""+i);
@@ -78,9 +82,13 @@ void setup() {
   
   String portName = Serial.list()[0];
   println(portName);
+<<<<<<< HEAD
 //  myPort = new Serial(this, portName, 57600);
   
   networkClient = new Client(this, "10.23.42.111", 2001);
+=======
+  myPort = new Serial(this, portName, 57600);
+>>>>>>> eb3f3ad9d7ba757cccad967ab5b8c35d5878daba
 }
 
 void draw() {
@@ -114,7 +122,11 @@ public void selectMaSl(){
    }
    else{
    boxTypOut = 0;
+<<<<<<< HEAD
    }
+=======
+   }  
+>>>>>>> eb3f3ad9d7ba757cccad967ab5b8c35d5878daba
   println("Masterbox "+masterBox);
 }
 
@@ -244,12 +256,20 @@ class DemoB extends DemoThread {
         while(true){
           flashTime = (int)sliderDuration.value();
           delayTime = (int)sliderDelay.value();
+<<<<<<< HEAD
           for(int i=0; i < NETWORK_SIZE; i++) {
+=======
+          for(int i=0; i < NETWORK_SIZE; i++) {          
+>>>>>>> eb3f3ad9d7ba757cccad967ab5b8c35d5878daba
             sendPWMCommandToLightBox(0,0,0,i);
           }
           delay(delayTime);
           color c = colorpicker.getColorValue();
+<<<<<<< HEAD
           for(int i=0; i < NETWORK_SIZE; i++) {
+=======
+          for(int i=0; i < NETWORK_SIZE; i++) {          
+>>>>>>> eb3f3ad9d7ba757cccad967ab5b8c35d5878daba
             sendPWMCommandToLightBox((int)red(c),
                                      (int)green(c),
                                      (int)blue(c),
