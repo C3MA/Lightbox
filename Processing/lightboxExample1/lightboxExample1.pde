@@ -1,7 +1,8 @@
-
 //needed to use serial to communicate to the lightbox
 import processing.serial.*;
-Serial myPort;
+import processing.net.*;
+Serial myPort = null;
+Client networkClient = null;
 
 import controlP5.*;
 ControlP5 controlP5;
@@ -9,7 +10,7 @@ ControlP5 controlP5;
 String textValue = "";
 Textfield myTextfield;
 
-//the slider gui elements 
+//the slider gui elements
 Slider sliderDelay;
 Slider sliderDuration;
 
@@ -21,7 +22,9 @@ DemoThread demoThread;
 //bangs are used to simulate the lightboxes
 Bang[] bang = new Bang[255];
 
-int NETWORK_SIZE = 3;
+int NETWORK_SIZE = 7;
+boolean masterBox = false ;
+int boxTypOut = 0;
 
 void setup() {
   size(640,480);
@@ -29,8 +32,8 @@ void setup() {
   frameRate(25);
   
   controlP5 = new ControlP5(this);
-  
-  for(int i=0; i < NETWORK_SIZE; i++){ 
+ 
+  for(int i=0; i < NETWORK_SIZE; i++){
     bang[i] = controlP5.addBang("bang" + i,100 + (i*25),250,20,20);
     bang[i].setId(i);
     bang[i].setCaptionLabel(""+i);
@@ -41,32 +44,43 @@ void setup() {
   myTextfield.setCaptionLabel("input ID here and press ENTER so send");
   myTextfield.setFocus(true);
   
+  //add CheckBox for Master-Slave-Selection
+  CheckBox selectMaSl;
+  selectMaSl = controlP5.addCheckBox("selectMaSl",20,50);
+  selectMaSl.addItem("Select Master-Box",0);
+  selectMaSl.setColorForeground(color(120));
+  selectMaSl.setColorActive(color(255));
+  selectMaSl.setColorLabel(color(255));
+  
   //add the buttons to the screen
   Button tmpB;
-  tmpB = controlP5.addButton("buttonStop",0,20,50,80,19);
+  tmpB = controlP5.addButton("buttonStop",0,20,75,80,19);
   tmpB.setCaptionLabel("stop demos");
-  tmpB = controlP5.addButton("demoA"     ,0,20,100,80,19);
+  tmpB = controlP5.addButton("demoA" ,0,20,100,80,19);
   tmpB.setCaptionLabel("start DemoA");
-  tmpB = controlP5.addButton("demoB"     ,0,20,125,80,19);
+  tmpB = controlP5.addButton("demoB" ,0,20,125,80,19);
   tmpB.setCaptionLabel("start DemoB");
-  tmpB = controlP5.addButton("demoC"     ,0,20,150,80,19);
+  tmpB = controlP5.addButton("demoC" ,0,20,150,80,19);
   tmpB.setCaptionLabel("start DemoC");
-  tmpB = controlP5.addButton("demoD"     ,0,20,175,80,19);
-  tmpB.setCaptionLabel("start DemoD");  
+  tmpB = controlP5.addButton("demoD" ,0,20,175,80,19);
+  tmpB.setCaptionLabel("start DemoD");
   tmpB = controlP5.addButton("demoColorPicker", 0,120,100,140,19);
   tmpB.setCaptionLabel("set colorpicker values");
 
   //addd the sliders
-  sliderDelay = controlP5.addSlider("sliderDelay",1,1000,300, 250,20,100,20);
+  sliderDelay = controlP5.addSlider("sliderDelay",1,1000,300, 250,20,300,20);
   sliderDelay.setCaptionLabel("delay");
-  sliderDuration = controlP5.addSlider("sliderDuration",1,500,20, 250,60,100,20);
+  sliderDuration = controlP5.addSlider("sliderDuration",1,500,20, 250,60,300,20);
   sliderDuration.setCaptionLabel("duration");
   
   //add the colorpicker
   colorpicker = controlP5.addColorPicker("colorpicker",300,100,255,30);
   
   String portName = Serial.list()[0];
-  myPort = new Serial(this, portName, 57600);
+  println(portName);
+//  myPort = new Serial(this, portName, 57600);
+  
+  networkClient = new Client(this, "10.23.42.111", 2001);
 }
 
 void draw() {
@@ -81,11 +95,29 @@ void stop()
   //cleanup when the user wants to quit
   tellOldThreadToKillItself();
   super.stop();
+  
+  if (networkClient != null)
+    networkClient.stop();
 }
 
+
 public void controlEvent(ControlEvent theEvent) {
-  println(theEvent.controller().name());
+    if(theEvent.isGroup()) {
+      selectMaSl();
+       }
+ }
+
+public void selectMaSl(){
+  masterBox = !masterBox;
+  if (masterBox == true){
+   boxTypOut = 1;
+   }
+   else{
+   boxTypOut = 0;
+   }
+  println("Masterbox "+masterBox);
 }
+
 
 public void demoA(int theValue) {
   tellOldThreadToKillItself();
@@ -122,7 +154,7 @@ public void buttonStop(int theValue) {
 }
 
 public void colorpicker(int value){
-  println("colorpicker " + value); 
+  println("colorpicker " + value);
 }
 
 void tellOldThreadToKillItself(){
@@ -130,16 +162,16 @@ void tellOldThreadToKillItself(){
   {
      //kill the old thread
     demoThread.endThread = true;
-    demoThread = null; 
+    demoThread = null;
   }
 }
 
 public void texting(String theText) {
   // receiving text from controller texting
   println("a textfield event for controller 'texting': "+theText);
+  int deviceId = Integer.parseInt(theText);
+  sendInit(deviceId, boxTypOut);
   
-  int deviceId = Integer.parseInt(theText); 
-  sendInit(deviceId);  
 }
 
 synchronized void sendPWMCommandToLightBox(int r, int g, int b, int id){
@@ -153,30 +185,33 @@ synchronized void sendPWMCommandToLightBox(int r, int g, int b, int id){
   sendStringCommandToLightBox(command);
 }
 
-synchronized void sendInit(int id){
+synchronized void sendInit(int id, int typ){
   String command = "pi";
   command += hex(0,2); // stuffing bytes
   command += hex(0,2); // stuffing bytes
-  command += hex(0,2); // stuffing bytes
+  command += hex(typ,2); // Master-Slave-Box-Selection 00=Slave-Box 01=Master-Box
   command += hex(id,2); // the id that should be set.
   command += "o";
   sendStringCommandToLightBox(command);
 }
 
 synchronized void sendStringCommandToLightBox(String cmd){
-  myPort.write(cmd);
+if (myPort != null)
+    myPort.write(cmd);
+  if (networkClient != null)
+    networkClient.write(cmd);
   println(cmd);
 }
 
 
-//the base class for the demos, adds the ability 
+//the base class for the demos, adds the ability
 //to a thread to end itself.
 class DemoThread extends Thread{
   public boolean endThread = false;
   
   protected void checkEnd() throws Exception{
     if(endThread == true){
-     throw new Exception(); 
+     throw new Exception();
     }
   }
 }
@@ -209,13 +244,19 @@ class DemoB extends DemoThread {
         while(true){
           flashTime = (int)sliderDuration.value();
           delayTime = (int)sliderDelay.value();
-          sendPWMCommandToLightBox(0,0,0,1);
+          for(int i=0; i < NETWORK_SIZE; i++) {
+            sendPWMCommandToLightBox(0,0,0,i);
+          }
           delay(delayTime);
           color c = colorpicker.getColorValue();
+          for(int i=0; i < NETWORK_SIZE; i++) {
             sendPWMCommandToLightBox((int)red(c),
                                      (int)green(c),
                                      (int)blue(c),
-                                     1);
+                                     i);
+          }
+          
+            
           delay(flashTime);
           checkEnd();
         }
@@ -237,7 +278,7 @@ class DemoC extends DemoThread {
         while(true) {
           delayMS = (int)sliderDelay.value();
           
-          for(int i=0; i < NETWORK_SIZE; i++) {          
+          for(int i=0; i < NETWORK_SIZE; i++) {
             checkEnd();
             if (posRed == i)
                sendPWMCommandToLightBox(255,0,0,i);
@@ -255,10 +296,10 @@ class DemoC extends DemoThread {
           if (posRed >= NETWORK_SIZE)
             posRed = 0;
           if (posBlue >= NETWORK_SIZE)
-            posBlue = 0;          
+            posBlue = 0;
           if (posGreen >= NETWORK_SIZE)
-            posGreen = 0;          
-          checkEnd(); 
+            posGreen = 0;
+          checkEnd();
         }
       } catch (Exception e){
         return;
@@ -283,7 +324,7 @@ class DemoD extends DemoThread {
           sendPWMCommandToLightBox(0,colorValue, 0,1);
           delay(delayMS);
           
-          checkEnd(); 
+          checkEnd();
         }
       } catch (Exception e){
         return;
@@ -297,7 +338,7 @@ class DemoColorPicker extends DemoThread {
       try{
         int delayMS = (int)sliderDelay.value();
         while(true){
-          for(int i=0; i < NETWORK_SIZE; i++) {          
+          for(int i=0; i < NETWORK_SIZE; i++) {
             checkEnd();
             color c = colorpicker.getColorValue();
             sendPWMCommandToLightBox((int)(red(c) * (alpha(c)/255)),
@@ -317,12 +358,12 @@ class DemoColorPicker extends DemoThread {
 
 /*
 class DemoC extends DemoThread {
-    public void run() {
-      try{
-        checkEnd();
-      } catch (Exception e){
-        return;
-      }
-    }
+public void run() {
+try{
+checkEnd();
+} catch (Exception e){
+return;
+}
+}
 }
 */
