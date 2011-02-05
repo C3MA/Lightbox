@@ -26,7 +26,7 @@ void setup()
 
 
   beat = new BeatDetect(in.bufferSize(), in.sampleRate());
-  beat.setSensitivity(300);
+  beat.setSensitivity(500);
 
 
   String portName = Serial.list()[0];

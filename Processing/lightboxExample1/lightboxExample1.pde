@@ -1,7 +1,8 @@
-
 //needed to use serial to communicate to the lightbox
-import processing.net.*; 
-Client networkClient; 
+import processing.serial.*;
+import processing.net.*;
+Serial myPort = null;
+Client networkClient = null;
 
 import controlP5.*;
 ControlP5 controlP5;
@@ -9,7 +10,7 @@ ControlP5 controlP5;
 String textValue = "";
 Textfield myTextfield;
 
-//the slider gui elements 
+//the slider gui elements
 Slider sliderDelay;
 Slider sliderDuration;
 
@@ -56,14 +57,12 @@ void setup() {
   Button tmpB;
   tmpB = controlP5.addButton("buttonStop",0,20,75,80,19);
   tmpB.setCaptionLabel("stop demos");
-  tmpB = controlP5.addButton("demoA"     ,0,20,100,80,19);
+  tmpB = controlP5.addButton("demoA" ,0,20,100,80,19);
   tmpB.setCaptionLabel("start DemoA");
-  tmpB = controlP5.addButton("demoB"     ,0,20,125,80,19);
+  tmpB = controlP5.addButton("demoB" ,0,20,125,80,19);
   tmpB.setCaptionLabel("start DemoB");
-  tmpB = controlP5.addButton("demoC"     ,0,20,150,80,19);
+  tmpB = controlP5.addButton("demoC" ,0,20,150,80,19);
   tmpB.setCaptionLabel("start DemoC");
-  tmpB = controlP5.addButton("demoD"     ,0,20,175,80,19);
-  tmpB.setCaptionLabel("start DemoD");
   tmpB = controlP5.addButton("demoRGB"     ,0,20,200,80,19);
   tmpB.setCaptionLabel("start demoRGB");   
   tmpB = controlP5.addButton("demoColorPicker", 0,120,100,140,19);
@@ -78,6 +77,11 @@ void setup() {
   //add the colorpicker
   colorpicker = controlP5.addColorPicker("colorpicker",300,100,255,30);
   
+  String portName = Serial.list()[0];
+  println(portName);
+//  myPort = new Serial(this, portName, 57600);
+  
+  networkClient = new Client(this, "10.23.42.111", 2001);
 }
 
 void draw() {
@@ -92,6 +96,9 @@ void stop()
   //cleanup when the user wants to quit
   tellOldThreadToKillItself();
   super.stop();
+  
+  if (networkClient != null)
+    networkClient.stop();
 }
 
 
@@ -154,7 +161,7 @@ public void buttonStop(int theValue) {
 }
 
 public void colorpicker(int value){
-  println("colorpicker " + value); 
+  println("colorpicker " + value);
 }
 
 void tellOldThreadToKillItself(){
@@ -162,7 +169,7 @@ void tellOldThreadToKillItself(){
   {
      //kill the old thread
     demoThread.endThread = true;
-    demoThread = null; 
+    demoThread = null;
   }
 }
 
@@ -196,19 +203,22 @@ synchronized void sendInit(int id, int typ){
 }
 
 synchronized void sendStringCommandToLightBox(String cmd){
-  networkClient.write(cmd);
+if (myPort != null)
+    myPort.write(cmd);
+  if (networkClient != null)
+    networkClient.write(cmd);
   println(cmd);
 }
 
 
-//the base class for the demos, adds the ability 
+//the base class for the demos, adds the ability
 //to a thread to end itself.
 class DemoThread extends Thread{
   public boolean endThread = false;
   
   protected void checkEnd() throws Exception{
     if(endThread == true){
-     throw new Exception(); 
+     throw new Exception();
     }
   }
 }
@@ -275,7 +285,7 @@ class DemoC extends DemoThread {
         while(true) {
           delayMS = (int)sliderDelay.value();
           
-          for(int i=0; i < NETWORK_SIZE; i++) {          
+          for(int i=0; i < NETWORK_SIZE; i++) {
             checkEnd();
             if (posRed == i)
                sendPWMCommandToLightBox(255,0,0,i);
@@ -293,10 +303,10 @@ class DemoC extends DemoThread {
           if (posRed >= NETWORK_SIZE)
             posRed = 0;
           if (posBlue >= NETWORK_SIZE)
-            posBlue = 0;          
+            posBlue = 0;
           if (posGreen >= NETWORK_SIZE)
-            posGreen = 0;          
-          checkEnd(); 
+            posGreen = 0;
+          checkEnd();
         }
       } catch (Exception e){
         return;
@@ -321,7 +331,7 @@ class DemoD extends DemoThread {
           sendPWMCommandToLightBox(0,colorValue, 0,1);
           delay(delayMS);
           
-          checkEnd(); 
+          checkEnd();
         }
       } catch (Exception e){
         return;
@@ -335,7 +345,7 @@ class DemoColorPicker extends DemoThread {
       try{
         int delayMS = (int)sliderDelay.value();
         while(true){
-          for(int i=0; i < NETWORK_SIZE; i++) {          
+          for(int i=0; i < NETWORK_SIZE; i++) {
             checkEnd();
             color c = colorpicker.getColorValue();
             sendPWMCommandToLightBox((int)(red(c) * (alpha(c)/255)),
@@ -410,12 +420,12 @@ class DemoRGB extends DemoThread {
 
 /*
 class DemoC extends DemoThread {
-    public void run() {
-      try{
-        checkEnd();
-      } catch (Exception e){
-        return;
-      }
-    }
+public void run() {
+try{
+checkEnd();
+} catch (Exception e){
+return;
+}
+}
 }
 */
