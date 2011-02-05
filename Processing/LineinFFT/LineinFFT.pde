@@ -6,6 +6,9 @@
  * Press 'w' to turn on windowing, press 'e' to turn it off.
  */
 
+import processing.net.*; 
+Client networkClient; 
+
 import ddf.minim.analysis.*;
 import ddf.minim.*;
 import controlP5.*;
@@ -13,18 +16,14 @@ ControlP5 controlP5;
 
 import processing.serial.*;
 Serial myPort;
-<<<<<<< HEAD
-Slider sliderGain;
-=======
 
->>>>>>> d797c9e6734f222e11dc5211d8e7f733bc931e38
 Minim minim;
 AudioInput in;
 FFT fft;
 String windowName;
 
 
-final int NETWORK_SIZE = 6;
+final int NETWORK_SIZE = 5;
 
 //bangs are used to simulate the lightboxes
 Bang[] bang = new Bang[NETWORK_SIZE];
@@ -32,16 +31,11 @@ Bang[][] colorInput = new Bang[NETWORK_SIZE][3]; // for each node and each color
 
 boolean slomotion = false;
 
-<<<<<<< HEAD
-int NETWORK_SIZE = 6;
- 
-float gain = 15.0;
- 
-=======
 
->>>>>>> d797c9e6734f222e11dc5211d8e7f733bc931e38
 void setup()
 {
+  networkClient = new Client(this, "10.23.42.111", 2001);
+  
   size(800, 600);
   //    size(512, 200, P3D);
   //  textMode(SCREEN);
@@ -65,7 +59,7 @@ void setup()
   strechPeak = round((width * 1.0) / fft.specSize());
   
   output = new int[NETWORK_SIZE * 4]; // We have three colors in each box available
-  slotsize = round((fft.specSize() * 1.0) / output.length);
+  slotsize = round((fft.specSize() * 1.0) / NETWORK_SIZE);
 
   windowName = "None";
   startVisualisationY = height - 150;
@@ -100,28 +94,16 @@ void setup()
     colorInput[i][2].setCaptionLabel(""+i);
     colorInput[i][2].setColorForeground(b);
   }
-<<<<<<< HEAD
-  /*sliderGain = controlP5.addSlider("sliderGain",0,500,1, 50,50,200,20);
-  gain=(float)sliderGain.value();*/
-  // open RS232 Port
-  String portName = Serial.list()[0];
-  myPort = new Serial(this, portName, 57600);
-}
- 
- 
-int[] output = new int[13];
-=======
 
   // open RS232 Port
-  String portName = Serial.list()[0];
-  myPort = new Serial(this, portName, 57600);
+  //String portName = Serial.list()[0];
+  //myPort = new Serial(this, portName, 57600);
 
 
   // a Hamming window can be used to shape the sample buffer that is passed to the FFT
   // this can reduce the amount of noise in the spectrum
   fft.window(FFT.HAMMING);
   windowName = "Hamming";
->>>>>>> d797c9e6734f222e11dc5211d8e7f733bc931e38
   
 }
 
@@ -201,27 +183,6 @@ void draw()
   }
 
   // Display the combined values
-<<<<<<< HEAD
-  //RGB
-  float x0=0.05;
-  float x2=0.5;
-  float x4=3;
-  float x6=10;
-  float x8=10;
-  float x10=20;
-  float x12=40;
-  int y1=50;
-  int y2=50;
-  int y3=50;
-  int y4=50;
-  sendPWMCommandToLightBox(0, int(magic(output[0])*x0), 0,   0);
-  sendPWMCommandToLightBox(0, int((magic(output[2])*x2*y1)/100), int((magic(output[2])*x2*y2)/100),  1);
-  sendPWMCommandToLightBox(0, 0, int(magic(output[4])*x4), 2);
-  sendPWMCommandToLightBox(0, 0, int(magic(output[8])*x8), 3);
-  sendPWMCommandToLightBox(int((magic(output[10])*x10*y3)/100), int((magic(output[10])*x10*y4)/100), 0, 4);
-  sendPWMCommandToLightBox(int(magic(output[12])*x12), 0, 0, 5);
-    
-=======
   /*  sendPWMCommandToLightBox(0, magic(output[2]), magic(output[0]),   0);
    sendPWMCommandToLightBox(0, magic(output[6]), magic(output[4]),  1);
    sendPWMCommandToLightBox(magic(output[8]), 0, magic(output[10]), 2);
@@ -254,7 +215,6 @@ void draw()
     r=-1; g=-1; b=-1;
   }
 
->>>>>>> d797c9e6734f222e11dc5211d8e7f733bc931e38
   fill(255);
   // keep us informed about the window being used
   text("The window being used is: " + windowName + ".    Drag the colors from each box over the sectrum.", 5, 20);
@@ -293,19 +253,15 @@ synchronized void sendPWMCommandToLightBox(int r, int g, int b, int id) {
 }
 
 synchronized void sendStringCommandToLightBox(String cmd) {
-  myPort.write(cmd);
+  networkClient.write(cmd);
+  //myPort.write(cmd);
   println(cmd);
 }
 
 int maxValue;
 
 int magic(int number) {
-<<<<<<< HEAD
-//  return (int) (255.0 * number / maxValue);  
-  return (int) (number*gain); // No Magic no longer
-=======
   //  return (int) (255.0 * number / maxValue);
   return number; //TODO No Magic no longer
->>>>>>> d797c9e6734f222e11dc5211d8e7f733bc931e38
 }
 
