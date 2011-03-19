@@ -79,9 +79,9 @@ void setup() {
   
   String portName = Serial.list()[0];
   println(portName);
-//  myPort = new Serial(this, portName, 57600);
+  myPort = new Serial(this, portName, 57600);
   
-  networkClient = new Client(this, "10.23.42.111", 2001);
+  //networkClient = new Client(this, "10.23.42.111", 2001);
 }
 
 void draw() {
@@ -203,10 +203,10 @@ synchronized void sendInit(int id, int typ){
 }
 
 synchronized void sendStringCommandToLightBox(String cmd){
-if (myPort != null)
+  if (myPort != null)
     myPort.write(cmd);
-  if (networkClient != null)
-    networkClient.write(cmd);
+  //if (networkClient != null)
+    //networkClient.write(cmd);
   println(cmd);
 }
 

@@ -7,7 +7,6 @@
  */
 
 import processing.net.*; 
-Client networkClient; 
 
 import ddf.minim.analysis.*;
 import ddf.minim.*;
@@ -139,15 +138,9 @@ void setup()
   }
 
   // open RS232 Port
-<<<<<<< HEAD
-  //String portName = Serial.list()[0];
-  //myPort = new Serial(this, portName, 57600);
-
-=======
   String portName = Serial.list()[0];
-  //myPort = new Serial(this, portName, 57600);
-  networkClient = new Client(this, "10.23.42.111", 2001);
->>>>>>> 5fddef017bad93d5c240572cbde9da86729bc3c8
+  myPort = new Serial(this, portName, 57600);
+  //networkClient = new Client(this, "10.23.42.111", 2001);
 
   // a Hamming window can be used to shape the sample buffer that is passed to the FFT
   // this can reduce the amount of noise in the spectrum
@@ -350,15 +343,10 @@ synchronized void sendPWMCommandToLightBox(int r, int g, int b, int id) {
 }
 
 synchronized void sendStringCommandToLightBox(String cmd) {
-<<<<<<< HEAD
-  networkClient.write(cmd);
-  //myPort.write(cmd);
-=======
   if (myPort != null)
     myPort.write(cmd);
   if (networkClient != null)
     networkClient.write(cmd);
->>>>>>> 5fddef017bad93d5c240572cbde9da86729bc3c8
   println(cmd);
 }
 
