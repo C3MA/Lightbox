@@ -15,8 +15,8 @@ int valueRed = 0;
 int valueGreen = 0;
 int valueBlue = 0;
 
-#define MAX_BRIGHT  255
-#define ID_STORE    1    // The address in the EEPROM where the device ID is stored.
+#define MAX_BRIGHT 255
+#define ID_STORE 1 // The address in the EEPROM where the device ID is stored.
 
 // This is the INT0 Pin of the ATMega8
 int progModePin = 2;
@@ -28,19 +28,31 @@ int programmMode = 0;
 unsigned long programmBtnTimeDown;
 int programmBtnReady = 1;
 
+void boxType(){
+  if(1 == boxtype){
+    digitalWrite(boxTypeSelect, HIGH);
+  } else {
+    digitalWrite(boxTypeSelect, LOW);
+  }
+}
 
 void setup(){
   resetPorts();
   
   programmBtnTimeDown = millis(); // initialize time
   deviceid = 1; // Set the device to unknown
+  boxtype = 0; //Slavemode
   Serial.begin(57600);
   
-  // read from the sense pin 
+  // read from the sense pin
   pinMode(progModePin, INPUT);
   digitalWrite(progModePin, HIGH);
 
+  pinMode (boxTypeSelect, OUTPUT);
+  
   deviceid = EEPROM.read(1);
+  boxtype = EEPROM.read(3);
+  boxType();
 }
 
 void resetPorts()
@@ -63,7 +75,7 @@ void clearCmdArray(){
 
 void setLedValues(int r, int g, int b)
 {
-   Serial.println("setLedValues");
+// Serial.println("setLedValues");
    analogWrite(9,r);
    analogWrite(10,g);
    analogWrite(11,b);
@@ -72,7 +84,7 @@ void setLedValues(int r, int g, int b)
 
 //bsp. pwffbbaa01o
 //returns number of read bytes
-int readFromSerialIntoCmdArray(){ 
+int readFromSerialIntoCmdArray(){
   
   //read from the serial buffer and flush
   int inputSize = Serial.available();
@@ -121,12 +133,12 @@ void loop()
     //setLedValues(0, 0, 50);
   }
   
-  if(programmBtnTimeDown > 0 
+  if(programmBtnTimeDown > 0
       && millis() > programmBtnTimeDown + 500 ){
     // someone has pressed the programmer button for 500ms
     programmMode = (programmMode) ? 0 : 1;
     
-    if (1 == programmMode) 
+    if (1 == programmMode)
       setLedValues(255, 255, 255);
     else if (0 == programmMode)
        setLedValues(0, 0, 0);
@@ -143,7 +155,7 @@ void loop()
     int checkCmd = checkCmdArrayForPrefix();
     if(checkCmd == 0){
        //Serial.println("if you dont know what to do type \"ollpehelp\"");
-       return; 
+       return;
     }
    
     
@@ -190,8 +202,14 @@ void loop()
        newdeviceid = EEPROM.read(1);
        //Serial.print("read newdeviceid = ");
        //Serial.println((int)newdeviceid);
+       
+       // Load the Mode: Slave or Master-Mode
+       byte newboxtype = decodeHex(myCmd[6], myCmd[7]);
+       boxtype = newboxtype;
+       EEPROM.write(3, newboxtype);
+       boxType();
            
-      } else { 
+      } else {
         // No programming mode
         //do nothing
       }
@@ -221,7 +239,7 @@ int decodeHex(char number1, char number2) {
   //Serial.println(value);
   value += decodeSingleHex(number2);
   //Serial.println("-------------");
-  return value; 
+  return value;
 }
 
 int decodeSingleHex(char number) {
@@ -229,5 +247,5 @@ int decodeSingleHex(char number) {
     return number - '0';
   else if (number >= 'A' && number <= 'F') {
     return number - 'A' + 10;
-  } 
+  }
 }
