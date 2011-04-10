@@ -1,0 +1,38 @@
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../uart.c:10:20: error: avr/io.h: No such file or directory
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../uart.c:11:27: error: avr/interrupt.h: No such file or directory
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../uart.c:12:26: error: avr/pgmspace.h: No such file or directory
+In file included from /Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../uart.c:13:
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../uart.h:84:2: error: #error "size of UART_RX_BUFFER_SIZE + UART_TX_BUFFER_SIZE larger than size of SRAM"
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../uart.c: In function 'uart_send_c':
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../uart.c:34: error: 'UDR' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../uart.c:34: error: (Each undeclared identifier is reported only once
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../uart.c:34: error: for each function it appears in.)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../uart.c: At top level:
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../uart.c:38: warning: return type defaults to 'int'
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../uart.c: In function 'ISR':
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../uart.c:38: warning: type of 'USART_RXC_vect' defaults to 'int'
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../uart.c:44: error: 'UCSRA' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../uart.c:46: error: 'UDR' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../uart.c:48: warning: implicit declaration of function '_BV'
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../uart.c:48: error: 'FE' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../uart.c:48: error: 'DOR' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../uart.c:65: warning: control reaches end of non-void function
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../uart.c: At top level:
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../uart.c:68: warning: return type defaults to 'int'
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../uart.c:68: error: redefinition of 'ISR'
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../uart.c:38: error: previous definition of 'ISR' was here
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../uart.c: In function 'ISR':
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../uart.c:68: warning: type of 'SIG_UART_DATA' defaults to 'int'
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../uart.c:77: error: 'UDR' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../uart.c:80: error: 'UCSRB' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../uart.c:80: error: 'UDRIE' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../uart.c:82: warning: control reaches end of non-void function
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../uart.c: In function 'uart_putc':
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../uart.c:105: error: 'UCSRB' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../uart.c:105: error: 'UDRIE' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../uart.c: In function 'uart_init_own':
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../uart.c:117: error: 'UCSRB' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../uart.c:117: error: 'RXCIE' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../uart.c:117: error: 'RXEN' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../uart.c:117: error: 'TXEN' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../uart.c:118: error: 'UBRRL' undeclared (first use in this function)

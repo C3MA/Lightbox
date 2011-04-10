@@ -79,7 +79,7 @@ void setup() {
   
   String portName = Serial.list()[0];
   println(portName);
-  myPort = new Serial(this, portName, 57600);
+  myPort = new Serial(this, portName, 57600, N, 8, 1.0);
   
   //networkClient = new Client(this, "10.23.42.111", 2001);
 }

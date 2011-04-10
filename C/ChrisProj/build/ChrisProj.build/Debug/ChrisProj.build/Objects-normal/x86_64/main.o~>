@@ -1,0 +1,43 @@
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../main.c:1:20: error: avr/io.h: No such file or directory
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../main.c:2:27: error: avr/interrupt.h: No such file or directory
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../main.c:3:23: error: avr/sleep.h: No such file or directory
+In file included from /Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../main.c:8:
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../uart.h:84:2: error: #error "size of UART_RX_BUFFER_SIZE + UART_TX_BUFFER_SIZE larger than size of SRAM"
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../main.c: In function 'main':
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../main.c:40: warning: implicit declaration of function 'cli'
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../main.c:41: error: 'DDRD' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../main.c:41: error: (Each undeclared identifier is reported only once
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../main.c:41: error: for each function it appears in.)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../main.c:41: error: 'PD6' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../main.c:41: error: 'PD5' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../main.c:42: error: 'PORTD' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../main.c:43: error: 'PIND' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../main.c:45: error: 'F_CPU' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../main.c:48: error: 'MCUCR' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../main.c:50: warning: implicit declaration of function 'sei'
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../main.c:54: error: 'DDRB' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../main.c:55: error: 'PORTB' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../main.c:57: warning: implicit declaration of function '_BV'
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../main.c:57: error: 'PB1' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../main.c:58: error: 'PB2' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../main.c:59: error: 'PB3' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../main.c:65: error: 'DDB1' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../main.c:65: error: 'DDB2' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../main.c:65: error: 'DDB3' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../main.c:68: error: 'TCCR1A' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../main.c:68: error: 'COM1A1' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../main.c:68: error: 'COM1A0' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../main.c:68: error: 'COM1B1' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../main.c:68: error: 'COM1B0' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../main.c:68: error: 'WGM10' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../main.c:69: error: 'TCCR1B' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../main.c:69: error: 'CS10' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../main.c:70: error: 'TCCR2' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../main.c:70: error: 'COM21' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../main.c:70: error: 'COM20' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../main.c:70: error: 'WGM20' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../main.c:70: error: 'CS20' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../main.c:110: error: 'OCR1AL' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../main.c:111: error: 'OCR1BL' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../main.c:112: error: 'OCR2' undeclared (first use in this function)
+/Users/ollo/Documents/c3/2011/avr/chris/ChrisProj/../main.c:73: warning: unused variable 'i'

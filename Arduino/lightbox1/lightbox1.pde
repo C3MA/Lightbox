@@ -63,7 +63,7 @@ void clearCmdArray(){
 
 void setLedValues(int r, int g, int b)
 {
-//   Serial.println("setLedValues");
+   Serial.println("setLedValues");
    analogWrite(9,r);
    analogWrite(10,g);
    analogWrite(11,b);
@@ -79,6 +79,7 @@ int readFromSerialIntoCmdArray(){
   
   if(inputSize < 11){
     //wait for more input
+    Serial.println("Zu wenig!");
     return -1;
   }
   

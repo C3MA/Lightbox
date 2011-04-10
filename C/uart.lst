@@ -1,0 +1,439 @@
+   1               		.file	"uart.c"
+   2               		.arch atmega8
+   3               	__SREG__ = 0x3f
+   4               	__SP_H__ = 0x3e
+   5               	__SP_L__ = 0x3d
+   6               	__tmp_reg__ = 0
+   7               	__zero_reg__ = 1
+   8               		.global __do_copy_data
+   9               		.global __do_clear_bss
+  12               		.text
+  13               	.Ltext0:
+  89               	.global	uart_send_c
+  91               	uart_send_c:
+  92               		.stabd	46,0,0
+   0:uart.c        **** /*
+   1:uart.c        ****  *  uart.c
+   2:uart.c        ****  *  ChrisProj
+   3:uart.c        ****  *
+   4:uart.c        ****  *  Created by ollo on 24.03.11.
+   5:uart.c        ****  *  Copyright 2011 __MyCompanyName__. All rights reserved.
+   6:uart.c        ****  *
+   7:uart.c        ****  */
+   8:uart.c        **** 
+   9:uart.c        **** #include <avr/io.h>
+  10:uart.c        **** #include <avr/interrupt.h>
+  11:uart.c        **** #include <avr/pgmspace.h>
+  12:uart.c        **** #include "uart.h"
+  13:uart.c        **** 
+  14:uart.c        **** 
+  15:uart.c        **** /* size of RX/TX buffers */
+  16:uart.c        **** #define UART_RX_BUFFER_MASK ( UART_RX_BUFFER_SIZE - 1)
+  17:uart.c        **** #define UART_TX_BUFFER_MASK ( UART_TX_BUFFER_SIZE - 1)
+  18:uart.c        **** 
+  19:uart.c        **** /*
+  20:uart.c        ****  *  module global variables
+  21:uart.c        ****  */
+  22:uart.c        **** static volatile unsigned char UART_TxBuf[UART_TX_BUFFER_SIZE];
+  23:uart.c        **** static volatile unsigned char UART_RxBuf[UART_RX_BUFFER_SIZE];
+  24:uart.c        **** static volatile unsigned char UART_TxHead;
+  25:uart.c        **** static volatile unsigned char UART_TxTail;
+  26:uart.c        **** static volatile unsigned char UART_RxHead;
+  27:uart.c        **** static volatile unsigned char UART_RxTail;
+  28:uart.c        **** static volatile unsigned char UART_LastRxError;
+  29:uart.c        **** 
+  30:uart.c        **** 
+  31:uart.c        **** void uart_send_c(unsigned char c)
+  32:uart.c        **** {
+  94               	.LM0:
+  95               	/* prologue: frame size=0 */
+  96               	/* prologue end (size=0) */
+  33:uart.c        **** 	UDR = c;
+  98               	.LM1:
+  99 0000 8CB9      		out 44-0x20,r24
+ 100               	/* epilogue: frame size=0 */
+ 101 0002 0895      		ret
+ 102               	/* epilogue end (size=1) */
+ 103               	/* function uart_send_c size 2 (1) */
+ 105               	.Lscope0:
+ 107               		.stabd	78,0,0
+ 109               	.global	__vector_11
+ 111               	__vector_11:
+ 112               		.stabd	46,0,0
+  34:uart.c        **** }
+  35:uart.c        **** 
+  36:uart.c        **** ISR(USART_RXC_vect)
+  37:uart.c        **** {	
+ 114               	.LM2:
+ 115               	/* prologue: frame size=0 */
+ 116 0004 1F92      		push __zero_reg__
+ 117 0006 0F92      		push __tmp_reg__
+ 118 0008 0FB6      		in __tmp_reg__,__SREG__
+ 119 000a 0F92      		push __tmp_reg__
+ 120 000c 1124      		clr __zero_reg__
+ 121 000e 2F93      		push r18
+ 122 0010 8F93      		push r24
+ 123 0012 9F93      		push r25
+ 124 0014 EF93      		push r30
+ 125 0016 FF93      		push r31
+ 126               	/* prologue end (size=10) */
+  38:uart.c        **** 	unsigned char tmphead;
+  39:uart.c        **** 	unsigned char data;
+  40:uart.c        **** 	unsigned char usr;
+  41:uart.c        **** 	unsigned char lastRxError;
+  42:uart.c        ****     // This registers are used on the atmega 8
+  43:uart.c        **** 	usr  = UCSRA;
+ 128               	.LM3:
+ 129 0018 9BB1      		in r25,43-0x20
+  44:uart.c        **** 	
+  45:uart.c        **** 	data = UDR;
+ 131               	.LM4:
+ 132 001a 2CB1      		in r18,44-0x20
+  46:uart.c        **** 	   
+  47:uart.c        **** 	lastRxError = (usr & (_BV(FE)|_BV(DOR)) ); // This error stuff should be reactivated
+ 134               	.LM5:
+ 135 001c 9871      		andi r25,lo8(24)
+  48:uart.c        **** 	
+  49:uart.c        ****     /* calculate buffer index */ 
+  50:uart.c        ****     tmphead = ( UART_RxHead + 1) & UART_RX_BUFFER_MASK;
+ 137               	.LM6:
+ 138 001e E091 0000 		lds r30,UART_RxHead
+ 139 0022 EF5F      		subi r30,lo8(-(1))
+ 140 0024 EF71      		andi r30,lo8(31)
+  51:uart.c        ****     
+  52:uart.c        ****     if ( tmphead == UART_RxTail ) {
+ 142               	.LM7:
+ 143 0026 8091 0000 		lds r24,UART_RxTail
+ 144 002a E817      		cp r30,r24
+ 145 002c 01F4      		brne .L4
+ 147               	.LM8:
+ 148 002e 92E0      		ldi r25,lo8(2)
+ 149 0030 00C0      		rjmp .L6
+ 150               	.L4:
+  53:uart.c        ****         /* error: receive buffer overflow */
+  54:uart.c        ****         lastRxError = UART_BUFFER_OVERFLOW >> 8;
+  55:uart.c        **** 				
+  56:uart.c        ****     }else{
+  57:uart.c        ****         /* store new index */
+  58:uart.c        ****         UART_RxHead = tmphead;
+ 152               	.LM9:
+ 153 0032 E093 0000 		sts UART_RxHead,r30
+  59:uart.c        ****         /* store received data in buffer */
+  60:uart.c        ****         UART_RxBuf[tmphead] = data;
+ 155               	.LM10:
+ 156 0036 FF27      		clr r31
+ 157 0038 E050      		subi r30,lo8(-(UART_RxBuf))
+ 158 003a F040      		sbci r31,hi8(-(UART_RxBuf))
+ 159 003c 2083      		st Z,r18
+ 160               	.L6:
+  61:uart.c        ****     }
+  62:uart.c        **** 	UART_LastRxError = lastRxError; 
+ 162               	.LM11:
+ 163 003e 9093 0000 		sts UART_LastRxError,r25
+ 164               	/* epilogue: frame size=0 */
+ 165 0042 FF91      		pop r31
+ 166 0044 EF91      		pop r30
+ 167 0046 9F91      		pop r25
+ 168 0048 8F91      		pop r24
+ 169 004a 2F91      		pop r18
+ 170 004c 0F90      		pop __tmp_reg__
+ 171 004e 0FBE      		out __SREG__,__tmp_reg__
+ 172 0050 0F90      		pop __tmp_reg__
+ 173 0052 1F90      		pop __zero_reg__
+ 174 0054 1895      		reti
+ 175               	/* epilogue end (size=10) */
+ 176               	/* function __vector_11 size 41 (21) */
+ 183               	.Lscope1:
+ 185               		.stabd	78,0,0
+ 187               	.global	__vector_12
+ 189               	__vector_12:
+ 190               		.stabd	46,0,0
+  63:uart.c        **** 	
+  64:uart.c        **** }
+  65:uart.c        **** 
+  66:uart.c        **** ISR(SIG_UART_DATA)
+  67:uart.c        **** {
+ 192               	.LM12:
+ 193               	/* prologue: frame size=0 */
+ 194 0056 1F92      		push __zero_reg__
+ 195 0058 0F92      		push __tmp_reg__
+ 196 005a 0FB6      		in __tmp_reg__,__SREG__
+ 197 005c 0F92      		push __tmp_reg__
+ 198 005e 1124      		clr __zero_reg__
+ 199 0060 8F93      		push r24
+ 200 0062 9F93      		push r25
+ 201 0064 EF93      		push r30
+ 202 0066 FF93      		push r31
+ 203               	/* prologue end (size=9) */
+  68:uart.c        **** 	unsigned char tmptail;
+  69:uart.c        **** 	
+  70:uart.c        ****     
+  71:uart.c        ****     if ( UART_TxHead != UART_TxTail) {
+ 205               	.LM13:
+ 206 0068 9091 0000 		lds r25,UART_TxHead
+ 207 006c 8091 0000 		lds r24,UART_TxTail
+ 208 0070 9817      		cp r25,r24
+ 209 0072 01F0      		breq .L9
+  72:uart.c        ****         /* calculate and store new buffer index */
+  73:uart.c        ****         tmptail = (UART_TxTail + 1) & UART_TX_BUFFER_MASK;
+ 211               	.LM14:
+ 212 0074 E091 0000 		lds r30,UART_TxTail
+ 213 0078 EF5F      		subi r30,lo8(-(1))
+ 214 007a EF71      		andi r30,lo8(31)
+  74:uart.c        ****         UART_TxTail = tmptail;
+ 216               	.LM15:
+ 217 007c E093 0000 		sts UART_TxTail,r30
+  75:uart.c        ****         /* get one byte from buffer and write it to UART */
+  76:uart.c        ****         UDR = UART_TxBuf[tmptail];  /* start transmission */
+ 219               	.LM16:
+ 220 0080 FF27      		clr r31
+ 221 0082 E050      		subi r30,lo8(-(UART_TxBuf))
+ 222 0084 F040      		sbci r31,hi8(-(UART_TxBuf))
+ 223 0086 8081      		ld r24,Z
+ 224 0088 8CB9      		out 44-0x20,r24
+ 225 008a 00C0      		rjmp .L12
+ 226               	.L9:
+  77:uart.c        ****     }else{
+  78:uart.c        ****         /* tx buffer empty, disable UDRE interrupt */
+  79:uart.c        ****         UCSRB &= ~_BV(UDRIE);
+ 228               	.LM17:
+ 229 008c 5598      		cbi 42-0x20,5
+ 230               	.L12:
+ 231               	/* epilogue: frame size=0 */
+ 232 008e FF91      		pop r31
+ 233 0090 EF91      		pop r30
+ 234 0092 9F91      		pop r25
+ 235 0094 8F91      		pop r24
+ 236 0096 0F90      		pop __tmp_reg__
+ 237 0098 0FBE      		out __SREG__,__tmp_reg__
+ 238 009a 0F90      		pop __tmp_reg__
+ 239 009c 1F90      		pop __zero_reg__
+ 240 009e 1895      		reti
+ 241               	/* epilogue end (size=9) */
+ 242               	/* function __vector_12 size 37 (19) */
+ 247               	.Lscope2:
+ 249               		.stabd	78,0,0
+ 252               	.global	uart_putc
+ 254               	uart_putc:
+ 255               		.stabd	46,0,0
+  80:uart.c        ****     }
+  81:uart.c        **** }
+  82:uart.c        **** 
+  83:uart.c        **** /*************************************************************************
+  84:uart.c        ****  Function: uart_putc()
+  85:uart.c        ****  Purpose:  write byte to ringbuffer for transmitting via UART
+  86:uart.c        ****  Input:    byte to be transmitted
+  87:uart.c        ****  Returns:  none          
+  88:uart.c        ****  **************************************************************************/
+  89:uart.c        **** extern void uart_putc(unsigned char data)
+  90:uart.c        **** {
+ 257               	.LM18:
+ 258               	/* prologue: frame size=0 */
+ 259               	/* prologue end (size=0) */
+ 260 00a0 282F      		mov r18,r24
+  91:uart.c        ****     unsigned char tmphead;
+  92:uart.c        **** 	
+  93:uart.c        ****     
+  94:uart.c        ****     tmphead  = (UART_TxHead + 1) & UART_TX_BUFFER_MASK;
+ 262               	.LM19:
+ 263 00a2 9091 0000 		lds r25,UART_TxHead
+ 264 00a6 9F5F      		subi r25,lo8(-(1))
+ 265 00a8 9F71      		andi r25,lo8(31)
+ 266               	.L14:
+  95:uart.c        ****     
+  96:uart.c        ****     while ( tmphead == UART_TxTail ){
+ 268               	.LM20:
+ 269 00aa 8091 0000 		lds r24,UART_TxTail
+ 270 00ae 9817      		cp r25,r24
+ 271 00b0 01F0      		breq .L14
+  97:uart.c        ****         ;/* wait for free space in buffer */
+  98:uart.c        ****     }
+  99:uart.c        ****     
+ 100:uart.c        ****     UART_TxBuf[tmphead] = data;
+ 273               	.LM21:
+ 274 00b2 E92F      		mov r30,r25
+ 275 00b4 FF27      		clr r31
+ 276 00b6 E050      		subi r30,lo8(-(UART_TxBuf))
+ 277 00b8 F040      		sbci r31,hi8(-(UART_TxBuf))
+ 278 00ba 2083      		st Z,r18
+ 101:uart.c        ****     UART_TxHead = tmphead;
+ 280               	.LM22:
+ 281 00bc 9093 0000 		sts UART_TxHead,r25
+ 102:uart.c        **** 	
+ 103:uart.c        ****     /* enable UDRE interrupt */
+ 104:uart.c        ****     UCSRB    |= _BV(UDRIE);
+ 283               	.LM23:
+ 284 00c0 559A      		sbi 42-0x20,5
+ 285               	/* epilogue: frame size=0 */
+ 286 00c2 0895      		ret
+ 287               	/* epilogue end (size=1) */
+ 288               	/* function uart_putc size 18 (17) */
+ 293               	.Lscope3:
+ 295               		.stabd	78,0,0
+ 298               	.global	uart_send_s
+ 300               	uart_send_s:
+ 301               		.stabd	46,0,0
+ 105:uart.c        **** 	
+ 106:uart.c        **** }/* uart_putc */
+ 107:uart.c        **** 
+ 108:uart.c        **** extern void uart_send_s(const char *s)
+ 109:uart.c        **** {
+ 303               	.LM24:
+ 304               	/* prologue: frame size=0 */
+ 305 00c4 CF93      		push r28
+ 306 00c6 DF93      		push r29
+ 307               	/* prologue end (size=2) */
+ 308 00c8 EC01      		movw r28,r24
+ 309 00ca 00C0      		rjmp .L20
+ 310               	.L21:
+ 110:uart.c        **** 	while (*s > 0)
+ 111:uart.c        **** 		uart_putc(*s++);
+ 312               	.LM25:
+ 313 00cc 2196      		adiw r28,1
+ 314 00ce 00D0      		rcall uart_putc
+ 315               	.L20:
+ 111:uart.c        **** 		uart_putc(*s++);
+ 317               	.LM26:
+ 318 00d0 8881      		ld r24,Y
+ 319 00d2 8823      		tst r24
+ 320 00d4 01F4      		brne .L21
+ 321               	/* epilogue: frame size=0 */
+ 322 00d6 DF91      		pop r29
+ 323 00d8 CF91      		pop r28
+ 324 00da 0895      		ret
+ 325               	/* epilogue end (size=3) */
+ 326               	/* function uart_send_s size 12 (7) */
+ 328               	.Lscope4:
+ 330               		.stabd	78,0,0
+ 333               	.global	uart_init_own
+ 335               	uart_init_own:
+ 336               		.stabd	46,0,0
+ 112:uart.c        **** }
+ 113:uart.c        **** 
+ 114:uart.c        **** extern int uart_init_own(const int baudrate)
+ 115:uart.c        **** {
+ 338               	.LM27:
+ 339               	/* prologue: frame size=0 */
+ 340               	/* prologue end (size=0) */
+ 116:uart.c        **** 	UCSRB |= (1 << RXCIE) | (1 << RXEN) | (1 << TXEN);
+ 342               	.LM28:
+ 343 00dc 2AB1      		in r18,42-0x20
+ 344 00de 2869      		ori r18,lo8(-104)
+ 345 00e0 2AB9      		out 42-0x20,r18
+ 117:uart.c        **** 	UBRRL = baudrate;
+ 347               	.LM29:
+ 348 00e2 89B9      		out 41-0x20,r24
+ 118:uart.c        **** 	return 0;
+ 119:uart.c        **** }
+ 350               	.LM30:
+ 351 00e4 80E0      		ldi r24,lo8(0)
+ 352 00e6 90E0      		ldi r25,hi8(0)
+ 353               	/* epilogue: frame size=0 */
+ 354 00e8 0895      		ret
+ 355               	/* epilogue end (size=1) */
+ 356               	/* function uart_init_own size 7 (6) */
+ 358               	.Lscope5:
+ 360               		.stabd	78,0,0
+ 362               	.global	uart_getc
+ 364               	uart_getc:
+ 365               		.stabd	46,0,0
+ 120:uart.c        **** 
+ 121:uart.c        **** /*************************************************************************
+ 122:uart.c        ****  Function: uart_getc()
+ 123:uart.c        ****  Purpose:  return byte from ringbuffer  
+ 124:uart.c        ****  Returns:  lower byte:  received byte from ringbuffer
+ 125:uart.c        ****  higher byte: last receive error
+ 126:uart.c        ****  **************************************************************************/
+ 127:uart.c        **** extern unsigned int uart_getc(void)
+ 128:uart.c        **** {    
+ 367               	.LM31:
+ 368               	/* prologue: frame size=0 */
+ 369               	/* prologue end (size=0) */
+ 129:uart.c        ****     unsigned char tmptail;
+ 130:uart.c        ****     unsigned char data;
+ 131:uart.c        **** 	
+ 132:uart.c        **** 	
+ 133:uart.c        ****     if ( UART_RxHead == UART_RxTail ) {
+ 371               	.LM32:
+ 372 00ea 9091 0000 		lds r25,UART_RxHead
+ 373 00ee 8091 0000 		lds r24,UART_RxTail
+ 374 00f2 9817      		cp r25,r24
+ 375 00f4 01F4      		brne .L27
+ 377               	.LM33:
+ 378 00f6 80E0      		ldi r24,lo8(256)
+ 379 00f8 91E0      		ldi r25,hi8(256)
+ 380 00fa 0895      		ret
+ 381               	.L27:
+ 134:uart.c        ****         return UART_NO_DATA;   /* no data available */
+ 135:uart.c        ****     }
+ 136:uart.c        ****     
+ 137:uart.c        ****     /* calculate /store buffer index */
+ 138:uart.c        ****     tmptail = (UART_RxTail + 1) & UART_RX_BUFFER_MASK;
+ 383               	.LM34:
+ 384 00fc E091 0000 		lds r30,UART_RxTail
+ 385 0100 EF5F      		subi r30,lo8(-(1))
+ 386 0102 EF71      		andi r30,lo8(31)
+ 139:uart.c        ****     UART_RxTail = tmptail; 
+ 388               	.LM35:
+ 389 0104 E093 0000 		sts UART_RxTail,r30
+ 140:uart.c        ****     
+ 141:uart.c        ****     /* get data from receive buffer */
+ 142:uart.c        ****     data = UART_RxBuf[tmptail];
+ 391               	.LM36:
+ 392 0108 FF27      		clr r31
+ 393 010a E050      		subi r30,lo8(-(UART_RxBuf))
+ 394 010c F040      		sbci r31,hi8(-(UART_RxBuf))
+ 395 010e 2081      		ld r18,Z
+ 143:uart.c        ****     
+ 144:uart.c        ****     return (UART_LastRxError << 8) + data;
+ 397               	.LM37:
+ 398 0110 8091 0000 		lds r24,UART_LastRxError
+ 399 0114 9927      		clr r25
+ 400 0116 982F      		mov r25,r24
+ 401 0118 8827      		clr r24
+ 402 011a 820F      		add r24,r18
+ 403 011c 911D      		adc r25,__zero_reg__
+ 145:uart.c        **** 	
+ 146:uart.c        **** }/* uart_getc */...
+ 405               	.LM38:
+ 406 011e 0895      		ret
+ 407               	/* epilogue: frame size=0 */
+ 408               	/* epilogue: noreturn */
+ 409               	/* epilogue end (size=0) */
+ 410               	/* function uart_getc size 27 (27) */
+ 416               	.Lscope6:
+ 418               		.stabd	78,0,0
+ 426               		.lcomm UART_LastRxError,1
+ 427               		.lcomm UART_RxTail,1
+ 428               		.lcomm UART_RxHead,1
+ 429               		.lcomm UART_TxTail,1
+ 430               		.lcomm UART_TxHead,1
+ 431               		.lcomm UART_RxBuf,32
+ 432               		.lcomm UART_TxBuf,32
+ 434               	.Letext0:
+ 435               	/* File "uart.c": code  144 = 0x0090 (  98), prologues  21, epilogues  25 */
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 uart.c
+/var/folders/EC/ECbZtGXfFZWjidEwY+C4q++++TM/-Tmp-//ccd2IuoF.s:3      *ABS*:000000000000003f __SREG__
+/var/folders/EC/ECbZtGXfFZWjidEwY+C4q++++TM/-Tmp-//ccd2IuoF.s:4      *ABS*:000000000000003e __SP_H__
+/var/folders/EC/ECbZtGXfFZWjidEwY+C4q++++TM/-Tmp-//ccd2IuoF.s:5      *ABS*:000000000000003d __SP_L__
+/var/folders/EC/ECbZtGXfFZWjidEwY+C4q++++TM/-Tmp-//ccd2IuoF.s:6      *ABS*:0000000000000000 __tmp_reg__
+/var/folders/EC/ECbZtGXfFZWjidEwY+C4q++++TM/-Tmp-//ccd2IuoF.s:7      *ABS*:0000000000000001 __zero_reg__
+/var/folders/EC/ECbZtGXfFZWjidEwY+C4q++++TM/-Tmp-//ccd2IuoF.s:91     .text:0000000000000000 uart_send_c
+/var/folders/EC/ECbZtGXfFZWjidEwY+C4q++++TM/-Tmp-//ccd2IuoF.s:111    .text:0000000000000004 __vector_11
+/var/folders/EC/ECbZtGXfFZWjidEwY+C4q++++TM/-Tmp-//ccd2IuoF.s:427    .bss:0000000000000002 UART_RxHead
+/var/folders/EC/ECbZtGXfFZWjidEwY+C4q++++TM/-Tmp-//ccd2IuoF.s:426    .bss:0000000000000001 UART_RxTail
+/var/folders/EC/ECbZtGXfFZWjidEwY+C4q++++TM/-Tmp-//ccd2IuoF.s:430    .bss:0000000000000005 UART_RxBuf
+                             .bss:0000000000000000 UART_LastRxError
+/var/folders/EC/ECbZtGXfFZWjidEwY+C4q++++TM/-Tmp-//ccd2IuoF.s:189    .text:0000000000000056 __vector_12
+/var/folders/EC/ECbZtGXfFZWjidEwY+C4q++++TM/-Tmp-//ccd2IuoF.s:429    .bss:0000000000000004 UART_TxHead
+/var/folders/EC/ECbZtGXfFZWjidEwY+C4q++++TM/-Tmp-//ccd2IuoF.s:428    .bss:0000000000000003 UART_TxTail
+/var/folders/EC/ECbZtGXfFZWjidEwY+C4q++++TM/-Tmp-//ccd2IuoF.s:431    .bss:0000000000000025 UART_TxBuf
+/var/folders/EC/ECbZtGXfFZWjidEwY+C4q++++TM/-Tmp-//ccd2IuoF.s:254    .text:00000000000000a0 uart_putc
+/var/folders/EC/ECbZtGXfFZWjidEwY+C4q++++TM/-Tmp-//ccd2IuoF.s:300    .text:00000000000000c4 uart_send_s
+/var/folders/EC/ECbZtGXfFZWjidEwY+C4q++++TM/-Tmp-//ccd2IuoF.s:335    .text:00000000000000dc uart_init_own
+/var/folders/EC/ECbZtGXfFZWjidEwY+C4q++++TM/-Tmp-//ccd2IuoF.s:364    .text:00000000000000ea uart_getc
+
+UNDEFINED SYMBOLS
+__do_copy_data
+__do_clear_bss

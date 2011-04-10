@@ -1,0 +1,290 @@
+   1               		.file	"timer.c"
+   2               		.arch atmega8
+   3               	__SREG__ = 0x3f
+   4               	__SP_H__ = 0x3e
+   5               	__SP_L__ = 0x3d
+   6               	__tmp_reg__ = 0
+   7               	__zero_reg__ = 1
+   8               		.global __do_copy_data
+   9               		.global __do_clear_bss
+  12               		.text
+  13               	.Ltext0:
+  90               	.global	__vector_9
+  92               	__vector_9:
+  93               		.stabd	46,0,0
+   0:timer.c       **** #include <avr/interrupt.h>
+   1:timer.c       **** #include <avr/pgmspace.h>
+   2:timer.c       **** 
+   3:timer.c       **** #include "timer.h"
+   4:timer.c       **** 
+   5:timer.c       **** // The number of times timer 0 has overflowed since the program started.
+   6:timer.c       **** // Must be volatile or gcc will optimize away some uses of it.
+   7:timer.c       **** volatile uint32_t timer0_overflow_count;
+   8:timer.c       **** 
+   9:timer.c       **** SIGNAL(SIG_OVERFLOW0)
+  10:timer.c       **** {
+  95               	.LM0:
+  96               	/* prologue: frame size=0 */
+  97 0000 1F92      		push __zero_reg__
+  98 0002 0F92      		push __tmp_reg__
+  99 0004 0FB6      		in __tmp_reg__,__SREG__
+ 100 0006 0F92      		push __tmp_reg__
+ 101 0008 1124      		clr __zero_reg__
+ 102 000a 8F93      		push r24
+ 103 000c 9F93      		push r25
+ 104 000e AF93      		push r26
+ 105 0010 BF93      		push r27
+ 106               	/* prologue end (size=9) */
+  11:timer.c       **** 	timer0_overflow_count++;
+ 108               	.LM1:
+ 109 0012 8091 0000 		lds r24,timer0_overflow_count
+ 110 0016 9091 0000 		lds r25,(timer0_overflow_count)+1
+ 111 001a A091 0000 		lds r26,(timer0_overflow_count)+2
+ 112 001e B091 0000 		lds r27,(timer0_overflow_count)+3
+ 113 0022 0196      		adiw r24,1
+ 114 0024 A11D      		adc r26,__zero_reg__
+ 115 0026 B11D      		adc r27,__zero_reg__
+ 116 0028 8093 0000 		sts timer0_overflow_count,r24
+ 117 002c 9093 0000 		sts (timer0_overflow_count)+1,r25
+ 118 0030 A093 0000 		sts (timer0_overflow_count)+2,r26
+ 119 0034 B093 0000 		sts (timer0_overflow_count)+3,r27
+ 120               	/* epilogue: frame size=0 */
+ 121 0038 BF91      		pop r27
+ 122 003a AF91      		pop r26
+ 123 003c 9F91      		pop r25
+ 124 003e 8F91      		pop r24
+ 125 0040 0F90      		pop __tmp_reg__
+ 126 0042 0FBE      		out __SREG__,__tmp_reg__
+ 127 0044 0F90      		pop __tmp_reg__
+ 128 0046 1F90      		pop __zero_reg__
+ 129 0048 1895      		reti
+ 130               	/* epilogue end (size=9) */
+ 131               	/* function __vector_9 size 37 (19) */
+ 133               	.Lscope0:
+ 135               		.stabd	78,0,0
+ 137               	.global	millis
+ 139               	millis:
+ 140               		.stabd	46,0,0
+  12:timer.c       **** }
+  13:timer.c       **** 
+  14:timer.c       **** uint32_t millis(void)
+  15:timer.c       **** {
+ 142               	.LM2:
+ 143               	/* prologue: frame size=0 */
+ 144               	/* prologue end (size=0) */
+  16:timer.c       **** 	// timer 0 increments every 64 cycles, and overflows when it reaches
+  17:timer.c       **** 	// 256.  we would calculate the total number of clock cycles, then
+  18:timer.c       **** 	// divide by the number of clock cycles per millisecond, but this
+  19:timer.c       **** 	// overflows too often.
+  20:timer.c       **** 	//return timer0_overflow_count * 64UL * 256UL / (F_CPU / 1000UL);
+  21:timer.c       **** 	
+  22:timer.c       **** 	// instead find 1/128th the number of clock cycles and divide by
+  23:timer.c       **** 	// 1/128th the number of clock cycles per millisecond
+  24:timer.c       **** 	return timer0_overflow_count * 64UL * 2UL / (F_CPU / 128000UL);
+ 146               	.LM3:
+ 147 004a 6091 0000 		lds r22,timer0_overflow_count
+ 148 004e 7091 0000 		lds r23,(timer0_overflow_count)+1
+ 149 0052 8091 0000 		lds r24,(timer0_overflow_count)+2
+ 150 0056 9091 0000 		lds r25,(timer0_overflow_count)+3
+ 151 005a 27E0      		ldi r18,7
+ 152 005c 660F      	1:	lsl r22
+ 153 005e 771F      		rol r23
+ 154 0060 881F      		rol r24
+ 155 0062 991F      		rol r25
+ 156 0064 2A95      		dec r18
+ 157 0066 01F4      		brne 1b
+ 158 0068 29E3      		ldi r18,lo8(57)
+ 159 006a 30E0      		ldi r19,hi8(57)
+ 160 006c 40E0      		ldi r20,hlo8(57)
+ 161 006e 50E0      		ldi r21,hhi8(57)
+ 162 0070 00D0      		rcall __udivmodsi4
+  25:timer.c       **** }
+ 164               	.LM4:
+ 165 0072 CA01      		movw r24,r20
+ 166 0074 B901      		movw r22,r18
+ 167               	/* epilogue: frame size=0 */
+ 168 0076 0895      		ret
+ 169               	/* epilogue end (size=1) */
+ 170               	/* function millis size 23 (22) */
+ 172               	.Lscope1:
+ 174               		.stabd	78,0,0
+ 177               	.global	delay
+ 179               	delay:
+ 180               		.stabd	46,0,0
+  26:timer.c       **** 
+  27:timer.c       **** void delay(uint32_t ms) {
+ 182               	.LM5:
+ 183               	/* prologue: frame size=0 */
+ 184 0078 AF92      		push r10
+ 185 007a BF92      		push r11
+ 186 007c CF92      		push r12
+ 187 007e DF92      		push r13
+ 188 0080 EF92      		push r14
+ 189 0082 FF92      		push r15
+ 190 0084 0F93      		push r16
+ 191 0086 1F93      		push r17
+ 192               	/* prologue end (size=8) */
+ 193 0088 5B01      		movw r10,r22
+ 194 008a 6C01      		movw r12,r24
+  28:timer.c       **** 	uint32_t start = millis();
+ 196               	.LM6:
+ 197 008c 00D0      		rcall millis
+ 198 008e 7B01      		movw r14,r22
+ 199 0090 8C01      		movw r16,r24
+ 200               	.L6:
+  29:timer.c       **** 	
+  30:timer.c       **** 	while (millis() - start < ms)
+ 202               	.LM7:
+ 203 0092 00D0      		rcall millis
+ 204 0094 6E19      		sub r22,r14
+ 205 0096 7F09      		sbc r23,r15
+ 206 0098 800B      		sbc r24,r16
+ 207 009a 910B      		sbc r25,r17
+ 208 009c 6A15      		cp r22,r10
+ 209 009e 7B05      		cpc r23,r11
+ 210 00a0 8C05      		cpc r24,r12
+ 211 00a2 9D05      		cpc r25,r13
+ 212 00a4 00F0      		brlo .L6
+ 213               	/* epilogue: frame size=0 */
+ 214 00a6 1F91      		pop r17
+ 215 00a8 0F91      		pop r16
+ 216 00aa FF90      		pop r15
+ 217 00ac EF90      		pop r14
+ 218 00ae DF90      		pop r13
+ 219 00b0 CF90      		pop r12
+ 220 00b2 BF90      		pop r11
+ 221 00b4 AF90      		pop r10
+ 222 00b6 0895      		ret
+ 223               	/* epilogue end (size=9) */
+ 224               	/* function delay size 32 (15) */
+ 229               	.Lscope2:
+ 231               		.stabd	78,0,0
+ 234               	.global	delayMicros
+ 236               	delayMicros:
+ 237               		.stabd	46,0,0
+  31:timer.c       **** 		;
+  32:timer.c       **** }
+  33:timer.c       **** 
+  34:timer.c       **** /* Ripped from wiring.c of arduino-0009
+  35:timer.c       ****  * Delay for the given number of microseconds.  Assumes a 16 MHz clock. 
+  36:timer.c       ****  * Disables interrupts, which will disrupt the millis() function if used
+  37:timer.c       ****  * too frequently. */
+  38:timer.c       **** void delayMicros(uint32_t us)
+  39:timer.c       **** {
+ 239               	.LM8:
+ 240               	/* prologue: frame size=0 */
+ 241               	/* prologue end (size=0) */
+  40:timer.c       **** 	uint8_t oldSREG;
+  41:timer.c       **** 
+  42:timer.c       **** 	// calling avrlib's delay_us() function with low values (e.g. 1 or
+  43:timer.c       **** 	// 2 microseconds) gives delays longer than desired.
+  44:timer.c       **** 	//delay_us(us);
+  45:timer.c       **** 
+  46:timer.c       **** 	// for a one-microsecond delay, simply return.  the overhead
+  47:timer.c       **** 	// of the function call yields a delay of approximately 1 1/8 us.
+  48:timer.c       **** 	if (--us == 0)
+ 243               	.LM9:
+ 244 00b8 6150      		subi r22,lo8(-(-1))
+ 245 00ba 7040      		sbci r23,hi8(-(-1))
+ 246 00bc 8040      		sbci r24,hlo8(-(-1))
+ 247 00be 9040      		sbci r25,hhi8(-(-1))
+ 248 00c0 01F0      		breq .L14
+  49:timer.c       **** 		return;
+  50:timer.c       **** 
+  51:timer.c       **** 	// the following loop takes a quarter of a microsecond (4 cycles)
+  52:timer.c       **** 	// per iteration, so execute it four times for each microsecond of
+  53:timer.c       **** 	// delay requested.
+  54:timer.c       **** 	us <<= 2;
+ 250               	.LM10:
+ 251 00c2 DC01      		movw r26,r24
+ 252 00c4 CB01      		movw r24,r22
+ 253 00c6 32E0      		ldi r19,2
+ 254 00c8 880F      	1:	lsl r24
+ 255 00ca 991F      		rol r25
+ 256 00cc AA1F      		rol r26
+ 257 00ce BB1F      		rol r27
+ 258 00d0 3A95      		dec r19
+ 259 00d2 01F4      		brne 1b
+  55:timer.c       **** 
+  56:timer.c       **** 	// account for the time taken in the preceeding commands.
+  57:timer.c       **** 	us -= 2;
+ 261               	.LM11:
+ 262 00d4 0297      		sbiw r24,2
+ 263 00d6 A109      		sbc r26,__zero_reg__
+ 264 00d8 B109      		sbc r27,__zero_reg__
+  58:timer.c       **** 
+  59:timer.c       **** 	// disable interrupts, otherwise the timer 0 overflow interrupt that
+  60:timer.c       **** 	// tracks milliseconds will make us delay longer than we want.
+  61:timer.c       **** 	oldSREG = SREG;
+ 266               	.LM12:
+ 267 00da 2FB7      		in r18,95-0x20
+  62:timer.c       **** 	cli();
+ 269               	.LM13:
+ 270               	/* #APP */
+ 271 00dc F894      		cli
+  63:timer.c       **** 
+  64:timer.c       **** 	// busy wait
+  65:timer.c       **** 	__asm__ __volatile__ (
+ 273               	.LM14:
+ 274 00de 0197      		1: sbiw r24,1
+ 275 00e0 01F4      		brne 1b
+  66:timer.c       **** 		"1: sbiw %0,1" "\n\t" // 2 cycles
+  67:timer.c       **** 		"brne 1b" : "=w" (us) : "0" (us) // 2 cycles
+  68:timer.c       **** 	);
+  69:timer.c       **** 
+  70:timer.c       **** 	// reenable interrupts.
+  71:timer.c       **** 	SREG = oldSREG;
+ 277               	.LM15:
+ 278               	/* #NOAPP */
+ 279 00e2 2FBF      		out 95-0x20,r18
+ 280               	.L14:
+ 281 00e4 0895      		ret
+ 282               	/* epilogue: frame size=0 */
+ 283               	/* epilogue: noreturn */
+ 284               	/* epilogue end (size=0) */
+ 285               	/* function delayMicros size 30 (30) */
+ 290               	.Lscope3:
+ 292               		.stabd	78,0,0
+ 294               	.global	TimerInit
+ 296               	TimerInit:
+ 297               		.stabd	46,0,0
+  72:timer.c       **** }
+  73:timer.c       **** 
+  74:timer.c       **** 
+  75:timer.c       **** void TimerInit(void) {
+ 299               	.LM16:
+ 300               	/* prologue: frame size=0 */
+ 301               	/* prologue end (size=0) */
+  76:timer.c       ****  	timer0_overflow_count = 0;
+ 303               	.LM17:
+ 304 00e6 1092 0000 		sts timer0_overflow_count,__zero_reg__
+ 305 00ea 1092 0000 		sts (timer0_overflow_count)+1,__zero_reg__
+ 306 00ee 1092 0000 		sts (timer0_overflow_count)+2,__zero_reg__
+ 307 00f2 1092 0000 		sts (timer0_overflow_count)+3,__zero_reg__
+ 308               	/* epilogue: frame size=0 */
+ 309 00f6 0895      		ret
+ 310               	/* epilogue end (size=1) */
+ 311               	/* function TimerInit size 9 (8) */
+ 313               	.Lscope4:
+ 315               		.stabd	78,0,0
+ 317               		.comm timer0_overflow_count,4,1
+ 319               	.Letext0:
+ 320               	/* File "timer.c": code  131 = 0x0083 (  94), prologues  17, epilogues  20 */
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 timer.c
+/var/folders/EC/ECbZtGXfFZWjidEwY+C4q++++TM/-Tmp-//ccXf3dFn.s:3      *ABS*:000000000000003f __SREG__
+/var/folders/EC/ECbZtGXfFZWjidEwY+C4q++++TM/-Tmp-//ccXf3dFn.s:4      *ABS*:000000000000003e __SP_H__
+/var/folders/EC/ECbZtGXfFZWjidEwY+C4q++++TM/-Tmp-//ccXf3dFn.s:5      *ABS*:000000000000003d __SP_L__
+/var/folders/EC/ECbZtGXfFZWjidEwY+C4q++++TM/-Tmp-//ccXf3dFn.s:6      *ABS*:0000000000000000 __tmp_reg__
+/var/folders/EC/ECbZtGXfFZWjidEwY+C4q++++TM/-Tmp-//ccXf3dFn.s:7      *ABS*:0000000000000001 __zero_reg__
+/var/folders/EC/ECbZtGXfFZWjidEwY+C4q++++TM/-Tmp-//ccXf3dFn.s:92     .text:0000000000000000 __vector_9
+                            *COM*:0000000000000004 timer0_overflow_count
+/var/folders/EC/ECbZtGXfFZWjidEwY+C4q++++TM/-Tmp-//ccXf3dFn.s:139    .text:000000000000004a millis
+/var/folders/EC/ECbZtGXfFZWjidEwY+C4q++++TM/-Tmp-//ccXf3dFn.s:179    .text:0000000000000078 delay
+/var/folders/EC/ECbZtGXfFZWjidEwY+C4q++++TM/-Tmp-//ccXf3dFn.s:236    .text:00000000000000b8 delayMicros
+/var/folders/EC/ECbZtGXfFZWjidEwY+C4q++++TM/-Tmp-//ccXf3dFn.s:296    .text:00000000000000e6 TimerInit
+
+UNDEFINED SYMBOLS
+__do_copy_data
+__do_clear_bss
+__udivmodsi4

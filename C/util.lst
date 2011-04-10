@@ -1,0 +1,141 @@
+   1               		.file	"util.c"
+   2               		.arch atmega8
+   3               	__SREG__ = 0x3f
+   4               	__SP_H__ = 0x3e
+   5               	__SP_L__ = 0x3d
+   6               	__tmp_reg__ = 0
+   7               	__zero_reg__ = 1
+   8               		.global __do_copy_data
+   9               		.global __do_clear_bss
+  12               		.text
+  13               	.Ltext0:
+  38               	decodeSingleHex:
+  39               		.stabd	46,0,0
+   0:util.c        **** /*
+   1:util.c        ****  *  util.c
+   2:util.c        ****  *  ChrisProj
+   3:util.c        ****  *
+   4:util.c        ****  *  Created by ollo on 25.03.11.
+   5:util.c        ****  *  Copyright 2011 __MyCompanyName__. All rights reserved.
+   6:util.c        ****  *
+   7:util.c        ****  */
+   8:util.c        **** 
+   9:util.c        **** #include "util.h"
+  10:util.c        **** #include <string.h>
+  11:util.c        **** #include <ctype.h>
+  12:util.c        **** 
+  13:util.c        **** static int decodeSingleHex(char number) {
+  41               	.LM0:
+  42               	/* prologue: frame size=0 */
+  43               	/* prologue end (size=0) */
+  44 0000 982F      		mov r25,r24
+  14:util.c        **** 	if (number >= '0' && number <= '9') {
+  46               	.LM1:
+  47 0002 8053      		subi r24,lo8(-(-48))
+  48 0004 8A30      		cpi r24,lo8(10)
+  49 0006 00F4      		brsh .L2
+  15:util.c        **** 		return number - '0';
+  51               	.LM2:
+  52 0008 892F      		mov r24,r25
+  53 000a 9927      		clr r25
+  54 000c C097      		sbiw r24,48
+  55 000e 0895      		ret
+  56               	.L2:
+  16:util.c        **** 	} else if (number >= 'A' && number <= 'F') {
+  58               	.LM3:
+  59 0010 892F      		mov r24,r25
+  60 0012 8154      		subi r24,lo8(-(-65))
+  61 0014 8630      		cpi r24,lo8(6)
+  62 0016 00F0      		brlo .L5
+  63 0018 80E0      		ldi r24,lo8(0)
+  64 001a 90E0      		ldi r25,hi8(0)
+  65 001c 0895      		ret
+  66               	.L5:
+  17:util.c        **** 		return number - 'A' + 10;
+  68               	.LM4:
+  69 001e 892F      		mov r24,r25
+  70 0020 9927      		clr r25
+  71 0022 C797      		sbiw r24,55
+  18:util.c        **** 	} else {
+  19:util.c        **** 		return 0;	// default zero is returned, so the addition won't create an error
+  20:util.c        **** 	}
+  21:util.c        **** }
+  73               	.LM5:
+  74 0024 0895      		ret
+  75               	/* epilogue: frame size=0 */
+  76               	/* epilogue: noreturn */
+  77               	/* epilogue end (size=0) */
+  78               	/* function decodeSingleHex size 19 (19) */
+  80               	.Lscope0:
+  82               		.stabd	78,0,0
+  86               	.global	decodeHex
+  88               	decodeHex:
+  89               		.stabd	46,0,0
+  22:util.c        **** 
+  23:util.c        **** extern int decodeHex(char number1, char number2) {
+  91               	.LM6:
+  92               	/* prologue: frame size=0 */
+  93 0026 FF92      		push r15
+  94 0028 0F93      		push r16
+  95 002a 1F93      		push r17
+  96               	/* prologue end (size=3) */
+  97 002c F62E      		mov r15,r22
+  24:util.c        **** 	int value = 0;
+  25:util.c        **** 	number1 = toupper(number1);
+  99               	.LM7:
+ 100 002e 9927      		clr r25
+ 101 0030 00D0      		rcall toupper
+ 102 0032 00D0      		rcall decodeSingleHex
+  26:util.c        **** 	number2 = toupper(number2);
+  27:util.c        **** 	
+  28:util.c        **** 	value = decodeSingleHex(number1);
+  29:util.c        **** 	//Serial.print("Number1: ");
+  30:util.c        **** 	//Serial.println(value);
+  31:util.c        **** 	value = value << 4;
+ 104               	.LM8:
+ 105 0034 8C01      		movw r16,r24
+ 106 0036 84E0      		ldi r24,4
+ 107 0038 000F      	1:	lsl r16
+ 108 003a 111F      		rol r17
+ 109 003c 8A95      		dec r24
+ 110 003e 01F4      		brne 1b
+  27:util.c        **** 	number2 = toupper(number2);
+ 112               	.LM9:
+ 113 0040 8F2D      		mov r24,r15
+ 114 0042 9927      		clr r25
+ 115 0044 00D0      		rcall toupper
+ 116 0046 00D0      		rcall decodeSingleHex
+  32:util.c        **** 	//Serial.print("Number1: ");
+  33:util.c        **** 	//Serial.println(value);
+  34:util.c        **** 	value += decodeSingleHex(number2);
+  35:util.c        **** 	//Serial.println("-------------");
+  36:util.c        **** 	return value; 
+  37:util.c        **** }
+ 118               	.LM10:
+ 119 0048 800F      		add r24,r16
+ 120 004a 911F      		adc r25,r17
+ 121               	/* epilogue: frame size=0 */
+ 122 004c 1F91      		pop r17
+ 123 004e 0F91      		pop r16
+ 124 0050 FF90      		pop r15
+ 125 0052 0895      		ret
+ 126               	/* epilogue end (size=4) */
+ 127               	/* function decodeHex size 23 (16) */
+ 129               	.Lscope1:
+ 131               		.stabd	78,0,0
+ 133               	.Letext0:
+ 134               	/* File "util.c": code   42 = 0x002a (  35), prologues   3, epilogues   4 */
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 util.c
+/var/folders/EC/ECbZtGXfFZWjidEwY+C4q++++TM/-Tmp-//cc0zsqhI.s:3      *ABS*:000000000000003f __SREG__
+/var/folders/EC/ECbZtGXfFZWjidEwY+C4q++++TM/-Tmp-//cc0zsqhI.s:4      *ABS*:000000000000003e __SP_H__
+/var/folders/EC/ECbZtGXfFZWjidEwY+C4q++++TM/-Tmp-//cc0zsqhI.s:5      *ABS*:000000000000003d __SP_L__
+/var/folders/EC/ECbZtGXfFZWjidEwY+C4q++++TM/-Tmp-//cc0zsqhI.s:6      *ABS*:0000000000000000 __tmp_reg__
+/var/folders/EC/ECbZtGXfFZWjidEwY+C4q++++TM/-Tmp-//cc0zsqhI.s:7      *ABS*:0000000000000001 __zero_reg__
+/var/folders/EC/ECbZtGXfFZWjidEwY+C4q++++TM/-Tmp-//cc0zsqhI.s:38     .text:0000000000000000 decodeSingleHex
+/var/folders/EC/ECbZtGXfFZWjidEwY+C4q++++TM/-Tmp-//cc0zsqhI.s:88     .text:0000000000000026 decodeHex
+
+UNDEFINED SYMBOLS
+__do_copy_data
+__do_clear_bss
+toupper
