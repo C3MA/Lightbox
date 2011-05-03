@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# AvrStudio Solution File, Format Version 11.00
+Project("{D1100916-62DA-4D80-A9B4-55A1E7CCEEB3}") = "Lightbox_sm", "Lightbox_sm\Lightbox_sm.avrgccproj", "{CE87A97C-CC41-4CC5-A80D-C07AEB88D581}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|AVR = Debug|AVR
+		Release|AVR = Release|AVR
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CE87A97C-CC41-4CC5-A80D-C07AEB88D581}.Debug|AVR.ActiveCfg = Debug|AVR
+		{CE87A97C-CC41-4CC5-A80D-C07AEB88D581}.Debug|AVR.Build.0 = Debug|AVR
+		{CE87A97C-CC41-4CC5-A80D-C07AEB88D581}.Release|AVR.ActiveCfg = Release|AVR
+		{CE87A97C-CC41-4CC5-A80D-C07AEB88D581}.Release|AVR.Build.0 = Release|AVR
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
