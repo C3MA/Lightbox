@@ -43,8 +43,8 @@ SUBDIRS :=
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS +=  \
-../Hello.c \
-../uart.c
+../lib_dmx_in.c \
+../lightbox_dmx.c
 
 
 PREPROCESSING_SRCS += 
@@ -54,44 +54,44 @@ ASM_SRCS +=
 
 
 OBJS +=  \
-Hello.o \
-uart.o
+lib_dmx_in.o \
+lightbox_dmx.o
 
 
 OBJS_AS_ARGS +=  \
-Hello.o \
-uart.o
+lib_dmx_in.o \
+lightbox_dmx.o
 
 
 C_DEPS +=  \
-Hello.d \
-uart.d
+lib_dmx_in.d \
+lightbox_dmx.d
 
 
 C_DEPS_AS_ARGS +=  \
-Hello.d \
-uart.d
+lib_dmx_in.d \
+lightbox_dmx.d
 
 
-OUTPUT_FILE_PATH +=Hello.elf
+OUTPUT_FILE_PATH +=Lightbox_dmx.elf
 
-OUTPUT_FILE_PATH_AS_ARGS +=Hello.elf
+OUTPUT_FILE_PATH_AS_ARGS +=Lightbox_dmx.elf
 
-HEX_FLASH_FILE_PATH +=Hello.hex
+HEX_FLASH_FILE_PATH +=Lightbox_dmx.hex
 
-HEX_FLASH_FILE_PATH_AS_ARGS +=Hello.hex
+HEX_FLASH_FILE_PATH_AS_ARGS +=Lightbox_dmx.hex
 
-HEX_EEPROM_FILE_PATH +=Hello.eep
+HEX_EEPROM_FILE_PATH +=Lightbox_dmx.eep
 
-HEX_EEPROM_FILE_PATH_AS_ARGS +=Hello.eep
+HEX_EEPROM_FILE_PATH_AS_ARGS +=Lightbox_dmx.eep
 
-LSS_FILE_PATH +=Hello.lss
+LSS_FILE_PATH +=Lightbox_dmx.lss
 
-LSS_FILE_PATH_AS_ARGS +=Hello.lss
+LSS_FILE_PATH_AS_ARGS +=Lightbox_dmx.lss
 
-MAP_FILE_PATH =Hello.map
+MAP_FILE_PATH =Lightbox_dmx.map
 
-MAP_FILE_PATH_AS_ARGS =Hello.map
+MAP_FILE_PATH_AS_ARGS =Lightbox_dmx.map
 
 ADDITIONAL_DEPENDENCIES:= $(HEX_FLASH_FILE_PATH) size
 
@@ -101,7 +101,7 @@ ADDITIONAL_DEPENDENCIES:= $(HEX_FLASH_FILE_PATH) size
 
 
 
-./%.o: .././%.c ../Hello.avrgccproj
+./%.o: .././%.c ../Lightbox_dmx.avrgccproj
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler
 	$(QUOTE)$(AVR_APP_PATH)avr-gcc.exe$(QUOTE) -funsigned-char -funsigned-bitfields -Os -fpack-struct -fshort-enums -Wall -c  -mmcu=atmega8   -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o"$@" "$<"

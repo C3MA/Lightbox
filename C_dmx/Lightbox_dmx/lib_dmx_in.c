@@ -26,6 +26,22 @@
 ;***************************************************************************/
 
 #include "lib_dmx_in.h"
+#ifndef F_CPU
+#warning "F_CPU war noch nicht definiert, wird nun nachgeholt mit 8000000"
+#define F_CPU 8000000UL  // Systemtakt in Hz - Definition als unsigned long beachten 
+                         // Ohne ergeben sich unten Fehler in der Berechnung
+#endif
+ 
+#define BAUD 25000UL      // Baudrate
+ 
+// Berechnungen
+#define UBRR_VAL ((F_CPU+BAUD*8)/(BAUD*16)-1)   // clever runden
+#define BAUD_REAL (F_CPU/(16*(UBRR_VAL+1)))     // Reale Baudrate
+#define BAUD_ERROR ((BAUD_REAL*1000)/BAUD) // Fehler in Promille, 1000 = kein Fehler.
+ 
+#if ((BAUD_ERROR<990) || (BAUD_ERROR>1010))
+  #error Systematischer Fehler der Baudrate grösser 1% und damit zu hoch! 
+#endif 
 
 // ********************* local definitions *********************
 
@@ -37,8 +53,8 @@ volatile uint8_t 	 gDmxState;
 void init_DMX_RX(void)
 {
 							
-UBRRH  = 0;										//enable reception
-UBRRL  = ((F_OSC/4000)-1);						//250kbaud, 8N2
+UBRRH = UBRR_VAL >> 8;
+UBRRL = UBRR_VAL & 0xFF;
 UCSRC  = (1<<URSEL)|(1<<UCSZ1)|(1<<UCSZ0)|(1<<USBS);
 UCSRB  = (1<<RXEN)|(1<<RXCIE);
 gDmxState= IDLE;
@@ -47,7 +63,7 @@ gDmxState= IDLE;
 
 
 // *************** DMX Reception ISR ****************
-ISR (UART_RX_vect)
+ISR (USART_RXC_vect)
 {
 static  uint16_t DmxCount;
 		uint8_t  USARTstate= UCSRA;				//get state before data!
