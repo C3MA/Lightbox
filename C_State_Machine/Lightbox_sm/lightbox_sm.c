@@ -7,17 +7,17 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <avr/pgmspace.h>
+#include <avr/sleep.h>
 #include <avr/eeprom.h>
 
-#include "uart.h"
 
 /* define CPU frequency in Mhz here if not defined in Makefile */
 #ifndef F_CPU
 #define F_CPU 7372800UL
 #endif
 
-/* 9600 baud */
-#define UART_BAUD_RATE      57600
+/* 57600 baud */
+#define UART_BAUD_RATE 57600UL
 
 #define UBRR_VAL ((F_CPU+UART_BAUD_RATE*8)/(UART_BAUD_RATE*16)-1)   // clever runden
 #define BAUD_REAL (F_CPU/(16*(UBRR_VAL+1)))     // Reale Baudrate
@@ -26,9 +26,6 @@
 #if ((BAUD_ERROR<990) || (BAUD_ERROR>1010))
   #error Systematischer Fehler der Baudrate groesser 1% und damit zu hoch! 
 #endif 
-
-#define COMMAND_LENGTH 10
-
 
 enum sm_states { SEARCH_PREFIX, READ_COMMAND, WAIT_FOR_END_W, WAIT_FOR_END_I, READ_RED_H, READ_RED_L, READ_GREEN_H, READ_GREEN_L, READ_BLUE_H, READ_BLUE_L, READ_ADDRESS_H, READ_ADDRESS_L, READ_NEW_ADDRESS_H, READ_NEW_ADDRESS_L, READ_TYP_H, READ_TYP_L, READ_STUFFING_0, READ_STUFFING_1, READ_STUFFING_2, READ_STUFFING_3};
 struct {
@@ -187,60 +184,85 @@ void initPWM() {
 	TCCR2  |= (1 << COM21) | (1 << COM20) | (1 << WGM20) | (1 << CS20);
 }
 
-/*
 void init_uart(void)
 {
-	UCSRB |= (1<<RXEN)|(1<<TXEN)|(1<<RXCIE);  // UART RX, TX und RX Interrupt einschalten
+	UCSRB = (1<<RXEN)|(1<<RXCIE);  // UART RX und RX Interrupt einschalten
 	UCSRC = (1<<URSEL)|(1<<UCSZ1)|(1<<UCSZ0);  // Asynchron 8N1 
  
-  UBRRH = UBRR_VAL >> 8;
-  UBRRL = UBRR_VAL & 0xFF;
+	UBRRH = UBRR_VAL >> 8;
+	UBRRL = UBRR_VAL & 0xFF;
+	
+	
+	#ifdef _DEBUG
+	UCSRB |= (1<<TXEN); //Tx
+	#endif // _DEBUG
 }
-*/
+
+#ifdef _DEBUG
+int uart_putc(unsigned char c)
+{
+    while (!(UCSRA & (1<<UDRE)))  /* warten bis Senden moeglich */
+    {
+    }                             
+ 
+    UDR = c;                      /* sende Zeichen */
+    return 0;
+}
+ 
+ 
+/* puts ist unabhaengig vom Controllertyp */
+void uart_puts (char *s)
+{
+    while (*s)
+    {   /* so lange *s != '\0' also ungleich dem "String-Endezeichen" */
+        uart_putc(*s);
+        s++;
+    }
+}
+#endif // _DEBUG
 
 int main(void)
 {
 	cli();
-	 /*
-     *  Initialize UART library, pass baudrate and AVR cpu clock
-     *  with the macro 
-     *  UART_BAUD_SELECT() (normal speed mode )
-     *  or 
-     *  UART_BAUD_SELECT_DOUBLE_SPEED() ( double speed mode)
-     */
-    uart_init( UART_BAUD_SELECT(UART_BAUD_RATE,F_CPU) ); 
-    
+	
+	init_uart();
+	
     /*
      * now enable interrupt, since UART library is interrupt controlled
      */
     sei();
 	address =  eeprom_read_byte(&address_persist);
 	
-	/*
-     *  Transmit string to UART
-     *  The string is buffered by the uart library in a circular buffer
-     *  and one character at a time is transmitted to the UART using interrupts.
-     *  uart_puts() blocks if it can not write the whole string to the circular 
-     *  buffer
-     */
-	
 	initPWM();
 	
-	setRGB(0,0,0);
+	setRGB(128,50,100);
+	
+	#ifdef _DEBUG
+	uart_puts("booted!!!\n");
+	#endif // _DEBUG
     
+	set_sleep_mode(SLEEP_MODE_IDLE);
+	
     while(1)
     {
-		/* TODO: Taster auswerten*/
-		c = uart_getc();
-        if ( c & UART_NO_DATA )
-        {
-            /* 
-             * no data available from UART 
-             */
-        }
-        else
-        {
-			refreshStateMachine(c);
-        }
-    }
+		/* TODO: Taster auswerten (Interupt gesteuert)*/
+		sleep_mode();
+	}		
+}
+
+ISR(USART_RXC_vect) {
+	unsigned char nextChar;
+ 
+	// Daten aus dem Puffer lesen
+	nextChar = UDR;
+	
+	#ifdef _DEBUG
+	uart_putc(nextChar);
+	#endif // _DEBUG
+	
+	refreshStateMachine(nextChar);
+}
+
+ISR(INT0_vect) {
+	
 }

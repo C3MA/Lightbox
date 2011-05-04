@@ -93,7 +93,7 @@ MAP_FILE_PATH =Lightbox_sm.map
 
 MAP_FILE_PATH_AS_ARGS =Lightbox_sm.map
 
-ADDITIONAL_DEPENDENCIES:= size
+ADDITIONAL_DEPENDENCIES:= $(HEX_FLASH_FILE_PATH) $(LSS_FILE_PATH) $(HEX_EEPROM_FILE_PATH) size
 
 # AVR/GNU C Compiler
 
@@ -131,7 +131,7 @@ all: $(OUTPUT_FILE_PATH) $(ADDITIONAL_DEPENDENCIES)
 $(OUTPUT_FILE_PATH): $(OBJS) $(USER_OBJS)
 	@echo Building target: $@
 	@echo Invoking: AVR/GNU C Linker
-	$(QUOTE)$(AVR_APP_PATH)avr-gcc.exe$(QUOTE)  -mmcu=atmega8   -o$(OUTPUT_FILE_PATH_AS_ARGS) $(OBJS_AS_ARGS) $(USER_OBJS) $(LIBS)
+	$(QUOTE)$(AVR_APP_PATH)avr-gcc.exe$(QUOTE)  -mmcu=atmega8  -Wl,-Map=$(MAP_FILE_PATH_AS_ARGS) -o$(OUTPUT_FILE_PATH_AS_ARGS) $(OBJS_AS_ARGS) $(USER_OBJS) $(LIBS)
 	@echo Finished building target: $@
 
 
