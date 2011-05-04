@@ -87,8 +87,11 @@ void refreshStateMachine(char c) {
 						state_machine.state = READ_STUFFING_0;
 					} else state_machine.state = SEARCH_PREFIX;
 					break;
-				case 'w': 
-					state_machine.state = READ_RED_H;
+				case 'w':
+					if (programing_mode)
+					{
+						state_machine.state = SEARCH_PREFIX;
+					} else state_machine.state = READ_RED_H;
 					break;
 				default:
 					state_machine.state = SEARCH_PREFIX;
@@ -127,7 +130,7 @@ void refreshStateMachine(char c) {
 			if(c=='o') {
 				eeprom_write_byte(&address_persist, state_machine.address);
 				address = state_machine.address;
-				setRGB(0,0,0);
+				setRGB(0,50,50);
 				programing_mode = 0;
 			}
 			state_machine.state = SEARCH_PREFIX;
@@ -250,7 +253,7 @@ int main(void)
 	init_Int0();
 	start_Timer0();
 	
-	setRGB(128,50,100);
+	setRGB(0,50,50);
 	
 	#ifdef _DEBUG
 	uart_puts("booted!!!\n");
@@ -297,10 +300,10 @@ ISR(TIMER0_OVF_vect) {
 						if(TASTER) {
 							if (programing_mode) {
 								programing_mode = 0;
-								setRGB(0x00,0x00,0x00);
+								setRGB(0x00,0x50,0x50);
 							} else {
 								programing_mode = 1;
-								setRGB(0xff,0xff,0xff);
+								setRGB(0xdf,0xdf,0xdf);
 							}								
 							taster_state = PRESSED;
 						} else taster_state = REALEASED;							
