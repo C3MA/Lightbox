@@ -43,8 +43,7 @@ SUBDIRS :=
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS +=  \
-../lightbox_sm.c \
-../uart.c
+../lightbox_sm.c
 
 
 PREPROCESSING_SRCS += 
@@ -54,23 +53,19 @@ ASM_SRCS +=
 
 
 OBJS +=  \
-lightbox_sm.o \
-uart.o
+lightbox_sm.o
 
 
 OBJS_AS_ARGS +=  \
-lightbox_sm.o \
-uart.o
+lightbox_sm.o
 
 
 C_DEPS +=  \
-lightbox_sm.d \
-uart.d
+lightbox_sm.d
 
 
 C_DEPS_AS_ARGS +=  \
-lightbox_sm.d \
-uart.d
+lightbox_sm.d
 
 
 OUTPUT_FILE_PATH +=Lightbox_sm.elf
@@ -96,8 +91,6 @@ MAP_FILE_PATH_AS_ARGS =Lightbox_sm.map
 ADDITIONAL_DEPENDENCIES:= $(HEX_FLASH_FILE_PATH) $(LSS_FILE_PATH) $(HEX_EEPROM_FILE_PATH) size
 
 # AVR/GNU C Compiler
-
-
 
 
 

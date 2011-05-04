@@ -10,7 +10,6 @@
 #include <avr/sleep.h>
 #include <avr/eeprom.h>
 
-
 /* define CPU frequency in Mhz here if not defined in Makefile */
 #ifndef F_CPU
 #define F_CPU 7372800UL
@@ -38,8 +37,20 @@ struct {
 
 uint8_t address_persist EEMEM; // standart adresse ist 255. Bei jedem flashen wird diese überschrieben
 uint8_t address;
-uint8_t programing_mode = 1; //TODO FIX address
-unsigned int c;
+
+volatile uint8_t programing_mode = 0;
+
+void init_Int0() {
+	DDRD &= ~(1<<DDD2);
+	PORTD |= (1<<PD2);
+}
+
+void start_Timer0() {
+	TCNT0 = 0x00;
+	TCCR0 = (1<<CS02); //Prescaler 256	
+	TIMSK |= (1<<TOIE0);
+}
+
 
 void setRGB(int red, int green, int blue) {	
 		OCR1AL = 0xFF - red;
@@ -116,6 +127,8 @@ void refreshStateMachine(char c) {
 			if(c=='o') {
 				eeprom_write_byte(&address_persist, state_machine.address);
 				address = state_machine.address;
+				setRGB(0,0,0);
+				programing_mode = 0;
 			}
 			state_machine.state = SEARCH_PREFIX;
 			break;
@@ -234,6 +247,8 @@ int main(void)
 	address =  eeprom_read_byte(&address_persist);
 	
 	initPWM();
+	init_Int0();
+	start_Timer0();
 	
 	setRGB(128,50,100);
 	
@@ -263,6 +278,39 @@ ISR(USART_RXC_vect) {
 	refreshStateMachine(nextChar);
 }
 
-ISR(INT0_vect) {
-	
+enum taster {PRESSED, REALEASED, P_1, R_1};
+uint8_t taster_state = REALEASED;
+
+#define TASTER (!(PIND & (1<<PIND2)))
+
+ISR(TIMER0_OVF_vect) {
+	switch(taster_state) {
+		case PRESSED:
+						if(!TASTER)
+							taster_state = R_1;
+						break;
+		case REALEASED:
+						if(TASTER)
+							taster_state = P_1;
+						break;
+		case P_1:		
+						if(TASTER) {
+							if (programing_mode) {
+								programing_mode = 0;
+								setRGB(0x00,0x00,0x00);
+							} else {
+								programing_mode = 1;
+								setRGB(0xff,0xff,0xff);
+							}								
+							taster_state = PRESSED;
+						} else taster_state = REALEASED;							
+						break;
+		case R_1:		
+						if(TASTER) {
+							taster_state = PRESSED;
+						} else {
+							taster_state = REALEASED;
+						}														
+						break;
+	}
 }
