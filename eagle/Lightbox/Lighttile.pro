@@ -2,8 +2,8 @@ EAGLE AutoRouter Statistics:
 
 Job           : /Users/christianplatz/Development/c3ma/Lichtbox/eagle/Lightbox/Lighttile.brd
 
-Start at      : 23:41:57 (05.05.11)
-End at        : 23:41:57 (05.05.11)
+Start at      : 00:12:47 (06.05.11)
+End at        : 00:12:47 (06.05.11)
 Elapsed time  : 00:00:00
 
 Signals       :    34   RoutingGrid: 50 mil  Layers: 2
@@ -18,8 +18,8 @@ Number of Ripups  :         0         0         0         0         0         0
 max. Level        :         0         0         0         0         0         0
 max. Total        :         0         0         0         0         0         0
 
-Routed            :        32        66        66        66        66        66
-Vias              :         0        36         1         0         0         0
-Resolution        :    44.4 %    91.7 %    91.7 %    91.7 %    91.7 %    91.7 %
+Routed            :        32        72        72        72        72        72
+Vias              :         0        44         3         0         0         0
+Resolution        :    44.4 %   100.0 %   100.0 %   100.0 %   100.0 %   100.0 %
 
-Final             : 91.7% beendet
+Final             : 100.0% beendet
