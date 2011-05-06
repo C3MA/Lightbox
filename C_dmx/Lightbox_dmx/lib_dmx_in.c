@@ -32,7 +32,7 @@
                          // Ohne ergeben sich unten Fehler in der Berechnung
 #endif
  
-#define BAUD 25000UL      // Baudrate
+#define BAUD 250000UL      // Baudrate
  
 // Berechnungen
 #define UBRR_VAL ((F_CPU+BAUD*8)/(BAUD*16)-1)   // clever runden
@@ -54,9 +54,10 @@ void init_DMX_RX(void)
 {
 							
 UBRRH = UBRR_VAL >> 8;
-UBRRL = UBRR_VAL & 0xFF;
+UBRRL = UBRR_VAL & 0xFF;		//250kbaud, 8N2
 UCSRC  = (1<<URSEL)|(1<<UCSZ1)|(1<<UCSZ0)|(1<<USBS);
 UCSRB  = (1<<RXEN)|(1<<RXCIE);
+
 gDmxState= IDLE;
 }
 
