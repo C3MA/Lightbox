@@ -44,7 +44,8 @@ SUBDIRS :=
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS +=  \
 ../lib_dmx_in.c \
-../lightbox_dmx.c
+../lightbox_dmx.c \
+../taster.c
 
 
 PREPROCESSING_SRCS += 
@@ -55,22 +56,26 @@ ASM_SRCS +=
 
 OBJS +=  \
 lib_dmx_in.o \
-lightbox_dmx.o
+lightbox_dmx.o \
+taster.o
 
 
 OBJS_AS_ARGS +=  \
 lib_dmx_in.o \
-lightbox_dmx.o
+lightbox_dmx.o \
+taster.o
 
 
 C_DEPS +=  \
 lib_dmx_in.d \
-lightbox_dmx.d
+lightbox_dmx.d \
+taster.d
 
 
 C_DEPS_AS_ARGS +=  \
 lib_dmx_in.d \
-lightbox_dmx.d
+lightbox_dmx.d \
+taster.d
 
 
 OUTPUT_FILE_PATH +=Lightbox_dmx.elf
@@ -93,9 +98,11 @@ MAP_FILE_PATH =Lightbox_dmx.map
 
 MAP_FILE_PATH_AS_ARGS =Lightbox_dmx.map
 
-ADDITIONAL_DEPENDENCIES:= $(HEX_FLASH_FILE_PATH) size
+ADDITIONAL_DEPENDENCIES:= $(HEX_FLASH_FILE_PATH) $(HEX_EEPROM_FILE_PATH) size
 
 # AVR/GNU C Compiler
+
+
 
 
 

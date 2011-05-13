@@ -29,6 +29,7 @@
     <MemorySettings>
     </MemorySettings>
     <GenerateHexFile>True</GenerateHexFile>
+    <GenerateEepFile>True</GenerateEepFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <ToolchainSettings>
@@ -55,6 +56,12 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="lightbox_dmx.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="taster.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="taster.h">
       <SubType>compile</SubType>
     </Compile>
   </ItemGroup>
