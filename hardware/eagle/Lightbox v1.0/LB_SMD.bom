@@ -1,0 +1,54 @@
+Stückliste exportiert aus /Users/severin/Documents/eagle/Lightboxen v1.0/LB_SMD.sch am 16.12.11 12:42
+
+Bauteil Wert            Device            Package           Description                            
+C1      100n            C-EUC1206         C1206             CAPACITOR, European symbol             
+C2      22p             C-EUC1206         C1206             CAPACITOR, European symbol             
+C3      22p             C-EUC1206         C1206             CAPACITOR, European symbol             
+C4      100p            C-EUC1206         C1206             CAPACITOR, European symbol             
+C5      60p             C-EUC1206         C1206             CAPACITOR, European symbol             
+C6      100n            C-EUC1206         C1206             CAPACITOR, European symbol             
+C7      47u             CPOL-EUUD-5X5,8   UD-5X5,8_NICHICON POLARIZED CAPACITOR, European symbol   
+C8      100p            C-EUC1206         C1206             CAPACITOR, European symbol             
+C9      47u             CPOL-EUUD-5X5,8   UD-5X5,8_NICHICON POLARIZED CAPACITOR, European symbol   
+C10     47u             CPOL-EUUD-5X5,8   UD-5X5,8_NICHICON POLARIZED CAPACITOR, European symbol   
+D1      MBRS120         SCHOTTKY-DIODESMD SMB               Schottky Diode                         
+D2      MBRS120         SCHOTTKY-DIODESMD SMB               Schottky Diode                         
+D3      MBRS120         SCHOTTKY-DIODESMD SMB               Schottky Diode                         
+D4      MBRS 340        DIODE-DO214AA     DO214AA           DIODE                                  
+IC1     MEGA8-AI        MEGA8-AI          TQFP32-08         MICROCONTROLLER                        
+IC2     MC34063AD       DIL8              DIL08             Dual In Line / Socket                  
+IC3     MC34063AD       DIL8              DIL08             Dual In Line / Socket                  
+IC4     MC34063AD       DIL8              DIL08             Dual In Line / Socket                  
+IC5     75176AD         75176AD           D_R-PDSO-G8       DIFFERENTIAL BUS TRANSCEIVER           
+JP1                     JP1E              JP1               JUMPER                                 
+JP2     LED Red         JP1E              JP1               JUMPER                                 
+JP3     LED Blue        JP1E              JP1               JUMPER                                 
+JP4     LED Green       JP1E              JP1               JUMPER                                 
+JP5     Supply          JP1E              JP1               JUMPER                                 
+L1      L-PISR 470u     PIS2408           PIS2408           Fastron SMD Power Inductors            
+L2      L-PISR 470u     PIS2408           PIS2408           Fastron SMD Power Inductors            
+L3      L-PISR 470u     PIS2408           PIS2408           Fastron SMD Power Inductors            
+L4      10u             1206F             1206F                                                    
+LED1    SMD LED 1206 RT LEDCHIPLED_1206   CHIPLED_1206      LED                                    
+LED2    SMD LED 1206 GN LEDCHIPLED_1206   CHIPLED_1206      LED                                    
+LED3    SMD LED 1206 GN LEDCHIPLED_1206   CHIPLED_1206      LED                                    
+Q1      8,0000-HC49 SMD CRYSTALSM49       SM49              CRYSTAL                                
+R1      10k             R-EU_M1206        M1206             RESISTOR, European symbol              
+R2      1,0             R-EU_M1206        M1206             RESISTOR, European symbol              
+R3      1,0             R-EU_M1206        M1206             RESISTOR, European symbol              
+R4      1,0             R-EU_M1206        M1206             RESISTOR, European symbol              
+R5      2,2             R-EU_M1206        M1206             RESISTOR, European symbol              
+R6      1,0             R-EU_M1206        M1206             RESISTOR, European symbol              
+R7      1,0             R-EU_M1206        M1206             RESISTOR, European symbol              
+R8      1,0             R-EU_M1206        M1206             RESISTOR, European symbol              
+R9      2,2             R-EU_M1206        M1206             RESISTOR, European symbol              
+R10     1,0             R-EU_M1206        M1206             RESISTOR, European symbol              
+R11     1,0             R-EU_M1206        M1206             RESISTOR, European symbol              
+R12     1,0             R-EU_M1206        M1206             RESISTOR, European symbol              
+R13     2,2             R-EU_M1206        M1206             RESISTOR, European symbol              
+R14     150             R-EU_M1206        M1206             RESISTOR, European symbol              
+R15     150             R-EU_M1206        M1206             RESISTOR, European symbol              
+R16     150             R-EU_M1206        M1206             RESISTOR, European symbol              
+S1      NT 08-SMD       219-08            CTS-219-08        Surface Mount DIP Switch Series 219 SMT
+SV1     WSL 6G          MA03-2            MA03-2            PIN HEADER                             
+SV2                     MA03-1            MA03-1            PIN HEADER                             
