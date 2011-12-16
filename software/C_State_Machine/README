@@ -1,8 +1,0 @@
-Diese Firmware für die Lightboxen ist in C geschrieben und basiert auf einer State machine.
-
-Es wird ein externer Quarz mit 7,3728 MHz verwendet um ein stabiles UART-Signal zu erzeugen.
-
-Verwendete Fuses:
-
-Hfuse: 0xD9
-Lfuse: 0xFE
