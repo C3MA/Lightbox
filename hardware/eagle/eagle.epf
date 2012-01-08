@@ -7,10 +7,11 @@ Desktop="Desktop"
 
 [Globals]
 AutoSaveProject=1
+UsedLibrary="C:/Program Files/EAGLE-5.11.0/lbr/pinhead.lbr"
 
 [Win_1]
 Type="Schematic Editor"
-Loc="150 150 749 549"
+Loc="175 175 774 574"
 State=0
 Number=2
 File="LB_SMD.sch"
