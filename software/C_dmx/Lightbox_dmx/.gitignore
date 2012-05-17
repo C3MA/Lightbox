@@ -2,3 +2,11 @@
 *.d
 *.elf
 *.hex
+*.cof
+*.eep
+*.map
+*.sym
+*.lss
+*.lst
+*.s
+
