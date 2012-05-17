@@ -36,7 +36,7 @@ void setRGB(int red, int green, int blue) {
 		OCR2   = 0xFF - blue;
 }
 
-void initPWM() {
+void initPWM(void) {
 	DDRB  = 0xff;                  // use all pins on PortB for output 
     PORTB = 0xff;                  // set output high -> turn all LEDs off
 	// set OC1A pin as output, required for output toggling
@@ -56,13 +56,13 @@ void initPWM() {
 	TCCR2  |= (1 << COM21) | (1 << COM20) | (1 << WGM20) | (1 << CS20);
 }
 
-void programming_switch_pressed() {
+void programming_switch_pressed(void) {
 	programing_switch_counter = 0;
 	programing_switch_counter_ov = 0;
 	programing_switch_counter_start = 1;
 }
 
-void programming_switch_realeased() {
+void programming_switch_realeased(void) {
 	if ((!programing_switch_counter_ov) && programing_mode)
 	{
 		deviceno++;
@@ -75,14 +75,14 @@ void programming_switch_realeased() {
 	programing_switch_counter_ov = 0;
 }
 
-void init_Int0() {
+void init_taster(void) {
 	DDRD &= ~(1<<DDD2);
 	PORTD |= (1<<PD2);
 	
 	taster_init(&program_taster, &PIND, PIND2, programming_switch_pressed, programming_switch_realeased);
 }
 
-void start_Timer0() {
+void start_Timer0(void) {
 	TCNT0 = 0x00;
 	TCCR0 = (1<<CS02) | (1<<CS00); //Prescaler 1024	
 	TIMSK |= (1<<TOIE0);
@@ -101,7 +101,7 @@ int main(void)
 	cli();
 	initPWM();
 	init_DMX_RX();
-	init_Int0();
+	init_taster();
 	start_Timer0();
 	sei();
 	

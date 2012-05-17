@@ -8,7 +8,12 @@
 #include "taster.h"
 #define NULL (void *) 0
 
-void taster_init(taster_t *taster, volatile uint8_t *port, uint8_t pin, void (*pressed) (), void (*released) ()) {
+void taster_init(taster_t *taster, 
+    volatile uint8_t *port, 
+    uint8_t pin, 
+    void (*pressed) (void), 
+    void (*released) (void)) 
+{
 	taster->state = TASTER_REALEASED;
 	taster->port = port;
 	taster->pin = pin;
