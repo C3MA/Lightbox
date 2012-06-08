@@ -1,54 +1,31 @@
-StÃ¼ckliste exportiert aus /Users/severin/Documents/eagle/Lightboxen v1.0/LB_SMD.sch am 09.01.12 20:16
+Stückliste exportiert aus C:/Users/dome/Documents/eagle/LB_SMD/LB_SMD_LM3404.sch am 05.06.2012 10:53:20
 
-Bauteil Wert            Device            Package           Description                            
-C1      100n            C-EUC1206         C1206             CAPACITOR, European symbol             
-C2      22p             C-EUC1206         C1206             CAPACITOR, European symbol             
-C3      22p             C-EUC1206         C1206             CAPACITOR, European symbol             
-C4      100p            C-EUC1206         C1206             CAPACITOR, European symbol             
-C5      60p             C-EUC1206         C1206             CAPACITOR, European symbol             
-C6      100n            C-EUC1206         C1206             CAPACITOR, European symbol             
-C7      47u             CPOL-EUUD-5X5,8   UD-5X5,8_NICHICON POLARIZED CAPACITOR, European symbol   
-C8      100p            C-EUC1206         C1206             CAPACITOR, European symbol             
-C9      47u             CPOL-EUUD-5X5,8   UD-5X5,8_NICHICON POLARIZED CAPACITOR, European symbol   
-C10     47u             CPOL-EUUD-5X5,8   UD-5X5,8_NICHICON POLARIZED CAPACITOR, European symbol   
-D1      MBRS120         SCHOTTKY-DIODESMD SMB               Schottky Diode                         
-D2      MBRS120         SCHOTTKY-DIODESMD SMB               Schottky Diode                         
-D3      MBRS120         SCHOTTKY-DIODESMD SMB               Schottky Diode                         
-D4      MBRS 340        DIODE-DO214AA     DO214AA           DIODE                                  
-IC1     MEGA8-AI        MEGA8-AI          TQFP32-08         MICROCONTROLLER                        
-IC2     MC34063AD       DIL8              DIL08             Dual In Line / Socket                  
-IC3     MC34063AD       DIL8              DIL08             Dual In Line / Socket                  
-IC4     MC34063AD       DIL8              DIL08             Dual In Line / Socket                  
-IC5     75176AD         75176AD           D_R-PDSO-G8       DIFFERENTIAL BUS TRANSCEIVER           
-JP1                     JP1E              JP1               JUMPER                                 
-JP2                     PINHD-1X1         1X01              PIN HEADER                             
-JP3                     PINHD-1X2         1X02              PIN HEADER                             
-L1      L-PISR 470u     PIS2408           PIS2408           Fastron SMD Power Inductors            
-L2      L-PISR 470u     PIS2408           PIS2408           Fastron SMD Power Inductors            
-L3      L-PISR 470u     PIS2408           PIS2408           Fastron SMD Power Inductors            
-L4      10u             1206F             1206F                                                    
-LED1    SMD LED 1206 RT LEDCHIPLED_1206   CHIPLED_1206      LED                                    
-LED2    SMD LED 1206 GN LEDCHIPLED_1206   CHIPLED_1206      LED                                    
-LED3    SMD LED 1206 GN LEDCHIPLED_1206   CHIPLED_1206      LED                                    
-Q1      8,0000-HC49 SMD CRYSTALSM49       SM49              CRYSTAL                                
-R1      10k             R-EU_M1206        M1206             RESISTOR, European symbol              
-R2      1,0             R-EU_M1206        M1206             RESISTOR, European symbol              
-R3      1,0             R-EU_M1206        M1206             RESISTOR, European symbol              
-R4      1,0             R-EU_M1206        M1206             RESISTOR, European symbol              
-R5      2,2             R-EU_M1206        M1206             RESISTOR, European symbol              
-R6      1,0             R-EU_M1206        M1206             RESISTOR, European symbol              
-R7      1,0             R-EU_M1206        M1206             RESISTOR, European symbol              
-R8      1,0             R-EU_M1206        M1206             RESISTOR, European symbol              
-R9      2,2             R-EU_M1206        M1206             RESISTOR, European symbol              
-R10     1,0             R-EU_M1206        M1206             RESISTOR, European symbol              
-R11     1,0             R-EU_M1206        M1206             RESISTOR, European symbol              
-R12     1,0             R-EU_M1206        M1206             RESISTOR, European symbol              
-R13     2,2             R-EU_M1206        M1206             RESISTOR, European symbol              
-R14     150             R-EU_M1206        M1206             RESISTOR, European symbol              
-R15     150             R-EU_M1206        M1206             RESISTOR, European symbol              
-R16     150             R-EU_M1206        M1206             RESISTOR, European symbol              
-S1      NT-10 SMD       219-10            CTS-219-10        Surface Mount DIP Switch Series 219 SMT
-SV1     WSL 6G          MA03-2            MA03-2            PIN HEADER                             
-TP1     TPTP18R         TPTP18R           TP18R             Test pad                               
-X1                      233-506           233-506           WAGO Cage Clamp                        
-X2                      233-505           233-505           WAGO Cage Clamp                        
+Menge Wert       Device            Bauteile                                  
+1                233-506           X1                                        
+1                DIODE-SOD323-W    D4                                        
+1                LEDCHIP-LED0805   H1                                        
+1                PINHD-2X3         JP1                                       
+1     1M         R-EU_R0805        R2                                        
+9     1R         R-EU_R0805        R9, R11, R12, R15, R16, R17, R20, R21, R22
+1     1k         R-EU_R0805        R3                                        
+1     8MHz       CRYSTALHC49S      Q1                                        
+3     10n        C-EUC0805         C17, C18, C19                             
+7     10u        C-1210            C9, C11, C13, C14, C15, C16, C20          
+2     22p        C-EUC0805         C2, C3                                    
+2     82k        R-EU_R0805        R10, R19                                  
+8     100R       R-EU_R0805        R5, R6, R7, R28, R29, R30, R31, R32       
+1     100R       R-EU_R1206        R27                                       
+2     100k       R-EU_R0805        R13, R18                                  
+8     100n       C-EUC0805         C1, C4, C5, C6, C7, C8, C10, C12          
+1     120R       R-EU_R0805        R4                                        
+1     180k       R-EU_R0805        R14                                       
+1     220k       R-EU_R0805        R8                                        
+1     470R       R-EU_R0805        R1                                        
+3     470u       PIS2408           L1, L2, L3                                
+1     75176      75176AD           U2                                        
+1     ATTiny2313 AT90S2313S        U1                                        
+1     LM1117-5.0 LM317MBSTT3       U3                                        
+3     LM3404     LM3404            U4, U5, U6                                
+3     MBRS120    SCHOTTKY-DIODESMD D1, D2, D3                                
+2     MEBP8-8G   MEBP8-8G          U$1, U$2                                  
+1     NT-10 SMD  219-10            SW1                                       
