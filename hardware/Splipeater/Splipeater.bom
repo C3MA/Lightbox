@@ -1,15 +1,16 @@
-Stückliste exportiert aus C:/Users/dome/Documents/GitHub/Lightbox/hardware/Splipeater/Splipeater.sch am 16.06.2012 11:36:44
+Stückliste exportiert aus C:/Users/dome/Documents/GitHub/Lightbox/hardware/Splipeater/Splipeater.sch am 16.06.2012 12:41:15
 
-Menge Wert        Device         Bauteile                        
-1                 GSH15          F1                              
-3                 R-EU_R0805     R3, R4, R5                      
-1                 W237-102       X1                              
-1     1K          R-EU_R0805     R2                              
-2     1N4004      DIODE-SOD323-W D2, D3                          
-1     6N137       6N137          OK1                             
-2     10n         C-EUC0805      C11, C14                        
-8     100n        C-EUC0805      C3, C4, C5, C6, C7, C8, C12, C13
-1     330R        R-EU_R0805     R1                              
-2     75176AD     75176AD        IC2, IC3                        
-2     LM317MBSTT3 LM317MBSTT3    IC4, IC5                        
-3     MEBP8-8G    MEBP8-8G       U$1, U$2, U$3                   
+Menge Wert        Device         Bauteile                            
+1                 GSH15          F1                                  
+1                 W237-102       X1                                  
+1     1K          R-EU_R0805     R2                                  
+2     1N4004      DIODE-SOD323-W D2, D3                              
+1     6N137       6N137          OK1                                 
+2     10n         C-EUC0805      C11, C14                            
+9     100n        C-EUC0805      C1, C3, C4, C5, C6, C7, C8, C12, C13
+2     120R        R-EU_R0805     R5, R8                              
+1     330R        R-EU_R0805     R1                                  
+2     390R        R-EU_R0805     R3, R4                              
+2     75176AD     75176AD        IC2, IC3                            
+2     LM317MBSTT3 LM317MBSTT3    IC4, IC5                            
+3     MEBP8-8G    MEBP8-8G       U$1, U$2, U$3                       
