@@ -132,7 +132,7 @@ int main(void)
     set_sleep_mode(SLEEP_MODE_IDLE);
 	
     // Status-LED an
-    PORTD |= 0x40;
+    PORTD |= 0x20;
 
     while(1)
     {
