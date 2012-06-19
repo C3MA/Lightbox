@@ -133,6 +133,7 @@ int main(void)
 	
     // Status-LED an
     PORTD |= 0x20;
+    //setRGB(127,127,127);
 
     while(1)
     {

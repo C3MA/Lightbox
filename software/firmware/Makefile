@@ -171,7 +171,7 @@ AVRDUDE_WRITE_FLASH = -U flash:w:$(TARGET).hex -P $(AVRDUDE_PORT)
 # Make sure to select the right fuse settings! USe
 # http://www.engbedded.com/fusecalc
 #AVRDUDE_WRITE_FUSES = -U lfuse:w:0x4e:m -U hfuse:w:0x99:m -U efuse:w:0xfc:m
-AVRDUDE_WRITE_FUSES = -U lfuse:w:0xe4:m -U hfuse:w:0xd9:m 
+AVRDUDE_WRITE_FUSES = -U lfuse:w:0xff:m -U hfuse:w:0xdf:m 
 
 
 # Uncomment the following if you want avrdude's erase cycle counter.
