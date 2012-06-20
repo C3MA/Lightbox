@@ -68,11 +68,17 @@ int16_t pwmtable[256] PROGMEM = {0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2,
 #endif
 
 void initIO(void) {
-    DDRB  = 0b00011100; // Direction-Register für Port B setzten
-    PORTB = 0b11100011; // Ausgabepins oder PullUp-Widerstände setzten
+    // Direction-Register für Port B setzten
+    DDRB  |= (1 << PB4) | (1 << PB3) | (1 << PB2); 
 
-    DDRD  = 0b00100000; // Direction-Register für Port D setzten
-    PORTD = 0b01011100; // Ausgabepins oder PullUp-Widerstände setzten
+    // Ausgabepins oder PullUp-Widerstände setzten
+    PORTB |= (1 << PB7) | (1 << PB6 ) | (1 << PB5) | (1 << PB1) | (1<< PB0);
+
+    // Direction-Register für Port D setzten
+    DDRD |= (1 << PD5);
+
+    // Ausgabepins oder PullUp-Widerstände setzten
+    PORTD |= (1 << PD6) | (1 << PD4) | (1 << PD3) | (1 << PD2);
 }
 
 uint16_t readDMXAddress(void) {
@@ -132,7 +138,7 @@ int main(void)
     set_sleep_mode(SLEEP_MODE_IDLE);
 	
     // Status-LED an
-    PORTD |= 0x20;
+    PORTD |= (1 << PD5);
     //setRGB(127,127,127);
 
     while(1)
