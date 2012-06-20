@@ -1,4 +1,4 @@
-Stückliste exportiert aus C:/Users/dome/Documents/eagle/LB_SMD/LB_SMD_LM3404.sch am 05.06.2012 10:53:20
+StÃ¼ckliste exportiert aus /home/dome/repo/Lightbox/hardware/Lightbox/LB_SMD.sch am 20.06.12 14:47
 
 Menge Wert       Device            Bauteile                                  
 1                233-506           X1                                        
@@ -8,6 +8,7 @@ Menge Wert       Device            Bauteile
 1     1M         R-EU_R0805        R2                                        
 9     1R         R-EU_R0805        R9, R11, R12, R15, R16, R17, R20, R21, R22
 1     1k         R-EU_R0805        R3                                        
+3     4k7        R-EU_R0805        R23, R24, R25                             
 1     8MHz       CRYSTALHC49S      Q1                                        
 3     10n        C-EUC0805         C17, C18, C19                             
 7     10u        C-1210            C9, C11, C13, C14, C15, C16, C20          
@@ -21,7 +22,7 @@ Menge Wert       Device            Bauteile
 1     180k       R-EU_R0805        R14                                       
 1     220k       R-EU_R0805        R8                                        
 1     470R       R-EU_R0805        R1                                        
-3     470u       PIS2408           L1, L2, L3                                
+3     470u       L-EUPISR          L1, L2, L3                                
 1     75176      75176AD           U2                                        
 1     ATTiny2313 AT90S2313S        U1                                        
 1     LM1117-5.0 LM317MBSTT3       U3                                        
