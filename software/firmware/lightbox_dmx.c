@@ -93,7 +93,7 @@ uint16_t readDMXAddress(void) {
         ((uint16_t) ((DMX_ADDRESS_PORT_7 & (1 << DMX_ADDRESS_PIN_7)) >> DMX_ADDRESS_PIN_7) << 7) |
         ((uint16_t) ((DMX_ADDRESS_PORT_8 & (1 << DMX_ADDRESS_PIN_8)) >> DMX_ADDRESS_PIN_8) << 8);
 
-    return address;
+    return (~address) & 0x01FF;
 }
 
 void setRGB(uint8_t red, uint8_t green, uint8_t blue) {
@@ -132,14 +132,22 @@ int main(void)
     DmxAddress = readDMXAddress();
 
     initPWM();
-    init_DMX_RX();
+    
+    if(DmxAddress == 0) 
+    {
+        setRGB(255,255,255);
+    }
+    else
+    {
+        init_DMX_RX();
+        setRGB(0,0,0);
+    }
     sei();
 
     set_sleep_mode(SLEEP_MODE_IDLE);
 	
     // Status-LED an
     PORTD |= (1 << PD5);
-    setRGB(0,0,0);
 
     while(1)
     {
