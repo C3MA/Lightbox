@@ -1,7 +1,8 @@
-Partlist exported from /home/kellerd/repo/Lightbox/hardware/Splipeater/Splipeater.sch at 6/25/12 11:12 AM
+Partlist exported from /home/kellerd/repo/Lightbox/hardware/Splipeater/Splipeater.sch at 7/16/12 11:42 AM
 
 Qty Value       Device         Parts                               
 1               NME            DC1                                 
+1               PINHD-1X2      JP3                                 
 2               PINHD-1X3      JP1, JP2                            
 1               W237-102       X1                                  
 1   1K          R-EU_R0805     R2                                  
@@ -9,7 +10,7 @@ Qty Value       Device         Parts
 1   3A          SHK20L         F1                                  
 1   6N137       6N137          OK1                                 
 2   10n         C-EUC0805      C11, C14                            
-2   10u         C-EUC0805      C2, C9                              
+2   10u         C-EUC1210      C2, C9                              
 9   100n        C-EUC0805      C1, C3, C4, C5, C6, C7, C8, C12, C13
 2   120R        R-EU_R0805     R5, R8                              
 1   330R        R-EU_R0805     R1                                  
