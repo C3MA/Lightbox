@@ -2,11 +2,11 @@
 *
 * Title			: DMX512 reception library
 * Version		: v1.3
-* Last updated	: 13.04.09
-* Target		: Transceiver Rev.3.01 [ATmega8515]
-* Clock			: 8MHz, 16MHz
+* Last updated	: 08.06.12
+* Target		: Lightbox-smd [attiny231]
+* Clock			: 8MHz
 *
-* written by hendrik hoelscher, www.hoelscher-hi.de
+* based on hendrik hoelscher, www.hoelscher-hi.de
 ***************************************************************************
  This program is free software; you can redistribute it and/or 
  modify it under the terms of the GNU General Public License 
@@ -45,63 +45,70 @@
 
 // ********************* local definitions *********************
 
-enum {IDLE, BREAK, STARTB, STARTADR};			//DMX states
+enum {IDLE, BREAK, STARTB, STARTADR}; //DMX states
 
-volatile uint8_t 	 gDmxState;
+volatile uint8_t gDmxState;
 
 // *************** DMX Reception Initialisation ****************
 void init_DMX_RX(void)
-{
-							
-UBRRH = UBRR_VAL >> 8;
-UBRRL = UBRR_VAL & 0xFF;		//250kbaud, 8N2
-UCSRC  = (1<<URSEL)|(1<<UCSZ1)|(1<<UCSZ0)|(1<<USBS);
-UCSRB  = (1<<RXEN)|(1<<RXCIE);
+{		
+    UBRRH = UBRR_VAL >> 8;
+    UBRRL = UBRR_VAL & 0xFF; //250kbaud, 8N2
+    UCSRC  = (1<<UCSZ1)|(1<<UCSZ0)|(1<<USBS);
+    UCSRB  = (1<<RXEN)|(1<<RXCIE);
 
-gDmxState= IDLE;
+    gDmxState= IDLE;
 }
 
 
 
 // *************** DMX Reception ISR ****************
-ISR (USART_RXC_vect)
+ISR (USART_RX_vect)
 {
-static  uint16_t DmxCount;
-		uint8_t  USARTstate= UCSRA;				//get state before data!
-		uint8_t  DmxByte   = UDR;				//get data
-		uint8_t  DmxState  = gDmxState;			//just load once from SRAM to increase speed
+    static  uint16_t DmxCount;
+    uint8_t  USARTstate= UCSRA;     //get state before data!
+    uint8_t  DmxByte   = UDR;       //get data
+    uint8_t  DmxState  = gDmxState; //just load once from SRAM to increase speed
  
-if (USARTstate &(1<<FE))						//check for break
-	{
-	UCSRA &= ~(1<<FE);							//reset flag (necessary for simulation in AVR Studio)
-	DmxCount =  DmxAddress;						//reset channel counter (count channels before start address)
-	gDmxState= BREAK;
-	}
+    if (USARTstate &(1<<FE)) //check for break
+    {
+        UCSRA &= ~(1<<FE); //reset flag (necessary for simulation in AVR Studio)
+        DmxCount =  DmxAddress;	//reset channel counter (count channels before start address)
+        gDmxState= BREAK;
+    }
+    
+    else 
+    {
+        switch(DmxState)
+        {
+            case BREAK:
+                if (DmxByte == 0)
+                {
+                    gDmxState= STARTB; //normal start code detected
+                }
+                else
+                {
+                    gDmxState= IDLE;
+	        }
+                break;
+    
+            case STARTB:
+                if (--DmxCount == 0) //start address reached?
+                {
+                    DmxCount= 1; //set up counter for required channels
+                    DmxRxField[0]= DmxByte; //get 1st DMX channel of device
+                    gDmxState= STARTADR;
+                }
+                break;
 
-else if (DmxState == BREAK)
-	{
-		/*TODO: Programmiermodus */
-	if (DmxByte == 0) gDmxState= STARTB;		//normal start code detected
-	else			  gDmxState= IDLE;
-	}
-	
-else if (DmxState == STARTB)
-	{
-	if (--DmxCount == 0)						//start address reached?
-		{
-		DmxCount= 1;							//set up counter for required channels
-		DmxRxField[0]= DmxByte;					//get 1st DMX channel of device
-		gDmxState= STARTADR;
-		}
-	}
-
-else if (DmxState == STARTADR)
-	{
-	DmxRxField[DmxCount++]= DmxByte;			//get channel
-	if (DmxCount >= sizeof(DmxRxField)) 		//all ch received?
-		{
-		gDmxState= IDLE;						//wait for next break
-		}
-	}							
+            case STARTADR:
+                DmxRxField[DmxCount++]= DmxByte; //get channel
+                if (DmxCount >= sizeof(DmxRxField)) //all ch received?
+	        {
+	            gDmxState= IDLE;//wait for next break
+                }
+                break;
+        }
+    }							
 }
 
