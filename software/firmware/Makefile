@@ -5,7 +5,7 @@
 # based on WinAVR Makefile Template written by Eric B. Weddington, Jörg Wunsch, et al.
 
 # List C source files here. (C dependencies are automatically generated.)
-SRC = $(TARGET).c uart.c timer.c util.c
+SRC = $(TARGET).c lib_dmx_in.c
 #Original: SRC = $(TARGET).c uart.c timer.c buzzer.c
 
 
@@ -20,14 +20,15 @@ ASRC =
 
 
 # MCU name
-MCU = atmega8
+MCU = attiny2313
 # Processor frequency.
-F_CPU = 7372800
-#F_CPU = 1000000	# <- internal QUARZ
+#F_CPU = 7372800
+F_CPU = 8000000
+# <- internal QUARZ
 # Output format. (can be srec, ihex, binary)
 FORMAT = ihex
 # Target file name (without extension).
-TARGET = main
+TARGET = lightbox_dmx
 
 
 
@@ -160,7 +161,7 @@ LDFLAGS += $(PRINTF_LIB) $(SCANF_LIB) $(MATH_LIB)
 # Type: avrdude -c ?
 # to get a full listing.
 #
-AVRDUDE_PROGRAMMER = avrispmkII
+AVRDUDE_PROGRAMMER = usbasp
 
 # com1 = serial port. Use lpt1 to connect to parallel port.
 AVRDUDE_PORT = usb    # programmer connected to serial device
@@ -170,7 +171,7 @@ AVRDUDE_WRITE_FLASH = -U flash:w:$(TARGET).hex -P $(AVRDUDE_PORT)
 # Make sure to select the right fuse settings! USe
 # http://www.engbedded.com/fusecalc
 #AVRDUDE_WRITE_FUSES = -U lfuse:w:0x4e:m -U hfuse:w:0x99:m -U efuse:w:0xfc:m
-AVRDUDE_WRITE_FUSES = -U lfuse:w:0xde:m -U hfuse:w:0x99:m -U efuse:w:0xff:m
+AVRDUDE_WRITE_FUSES = -U lfuse:w:0xff:m -U hfuse:w:0xdf:m 
 
 
 # Uncomment the following if you want avrdude's erase cycle counter.
