@@ -103,8 +103,43 @@ void setRGB(uint8_t red, uint8_t green, uint8_t blue) {
 
     // pgm_read_word(pwmtable + red);
 
+    if (PWM_REG_RED == 0x00) {
+	if (red > 0) {
+		TCCR1A |= (1 << COM1B1);
+	}
+    }
+    else {
+        if (red == 0) {
+		TCCR1A &= ~(1 << COM1B1);
+		PORTB &= ~(1 << PB4);
+        }
+    }
     PWM_REG_RED = red;
+
+    if (PWM_REG_GREEN == 0x00) {
+	if (green > 0) {
+		TCCR1A |= (1 << COM1A1);
+	}
+    }
+    else {
+        if (green == 0) {
+		TCCR1A &= ~(1 << COM1A1);
+		PORTB &= ~(1 << PB3);
+        }
+    }
     PWM_REG_GREEN = green;
+    
+    if (PWM_REG_BLUE == 0x00) {
+	if (blue > 0) {
+		TCCR0A |= (1 << COM0A1);
+	}
+    }
+    else {
+        if (blue == 0) {
+		TCCR0A &= ~(1 << COM0A1);
+		PORTB &= ~(1 << PB2);
+        }
+    }
     PWM_REG_BLUE = blue;
 }
 
@@ -113,11 +148,12 @@ void initPWM(void) {
     PWM_REG_GREEN = 0;
     PWM_REG_BLUE = 0;
 
-    //Fast-PWM-Mode mit SET bei 255 und CLEAR bei compare
+    //Fast-PWM-Mode mit SET bei 255; aber nicht mit den Ausgangspin verbunden; Da standartmäßig 0 und das glimmen unerwünscht ist. 
+    // CLEAR bei compare muss gesetzt werden um die PWMs mit den Ausgangpins zu verbinden.
     //OC0A 
-    TCCR0A = (1 << COM0A1) | (1 << WGM01) | (1 << WGM00);
+    TCCR0A = (1 << WGM01) | (1 << WGM00);
     //OC1A & OC1B
-    TCCR1A = (1 << COM1A1) | (1 << COM1B1) | (1 << WGM10) | (1 << WGM12);
+    TCCR1A = (1 << WGM10) | (1 << WGM12);
 
     //prescaler 8
     TCCR0B = (1 << CS01);
