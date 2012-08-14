@@ -33,6 +33,8 @@
 #define PWM_REG_GREEN OCR1A
 #define PWM_REG_BLUE  OCR0A
 
+#define PWM_LOG_8 1
+
 #if PWM_LOG_8
 
 const uint8_t pwmtable[32] PROGMEM =
@@ -137,9 +139,9 @@ void initPWM(void) {
     //OC1A & OC1B
     TCCR1A = (1 << WGM10) | (1 << WGM12);
 
-    //prescaler 8
-    TCCR0B = (1 << CS01); // (1 << CS00) for no prescaler
-    TCCR1B = (1 << CS11); // (1 << CS10) for no prescaler
+    //prescaler 64
+    TCCR0B = (1 << CS01) | (1 << CS00); 
+    TCCR1B = (1 << CS11) | (1 << CS10);
 }
 
 int main(void)
