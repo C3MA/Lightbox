@@ -3,6 +3,7 @@
  *
  * Created: 08.06.2012
  *  Author: tobias
+ *  Firmware version 2.0
  */ 
 #include <avr/io.h>
 #include <avr/pgmspace.h>
@@ -46,16 +47,16 @@ const uint8_t pwmtable[32] PROGMEM =
 #endif
 
 void initIO(void) {
-    // Direction-Register für Port B setzten
+    // Direction-Register fï¿½r Port B setzten
     DDRB  |= (1 << PB4) | (1 << PB3) | (1 << PB2); 
 
-    // Ausgabepins oder PullUp-Widerstände setzten
+    // Ausgabepins oder PullUp-Widerstï¿½nde setzten
     PORTB |= (1 << PB7) | (1 << PB6 ) | (1 << PB5) | (1 << PB1) | (1<< PB0);
 
-    // Direction-Register für Port D setzten
+    // Direction-Register fï¿½r Port D setzten
     DDRD |= (1 << PD5);
 
-    // Ausgabepins oder PullUp-Widerstände setzten
+    // Ausgabepins oder PullUp-Widerstï¿½nde setzten
     PORTD |= (1 << PD6) | (1 << PD4) | (1 << PD3) | (1 << PD2);
 }
 
@@ -132,7 +133,7 @@ void initPWM(void) {
     PWM_REG_GREEN = 0;
     PWM_REG_BLUE = 0;
 
-    //Fast-PWM-Mode mit SET bei 255; aber nicht mit den Ausgangspin verbunden; Da standartmäßig 0 und das glimmen unerwünscht ist. 
+    //Fast-PWM-Mode mit SET bei 255; aber nicht mit den Ausgangspin verbunden; Da standartmï¿½ï¿½ig 0 und das glimmen unerwï¿½nscht ist. 
     // CLEAR bei compare muss gesetzt werden um die PWMs mit den Ausgangpins zu verbinden.
     //OC0A 
     TCCR0A = (1 << WGM01) | (1 << WGM00);
