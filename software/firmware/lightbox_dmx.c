@@ -9,6 +9,7 @@
 #include <avr/pgmspace.h>
 #include <avr/eeprom.h>
 #include <avr/sleep.h>
+#include <avr/wdt.h>
 #include "lib_dmx_in.h"
 
 #define DMX_ADDRESS_PORT_0 PINB
@@ -35,6 +36,7 @@
 #define PWM_REG_BLUE  OCR0A
 
 #define PWM_LOG_8 1
+#define USE_WDT 1
 
 #if PWM_LOG_8
 
@@ -126,6 +128,10 @@ void setRGB(uint8_t red, uint8_t green, uint8_t blue) {
         }
     }
     PWM_REG_BLUE = blue;
+
+#if USE_WDT
+    wdt_reset();
+#endif
 }
 
 void initPWM(void) {
@@ -153,7 +159,12 @@ int main(void)
     DmxAddress = readDMXAddress();
 
     initPWM();
-    
+
+#if USE_WDT
+    // Init WDT 60 milisecends
+    wdt_enable(WDTO_60MS);
+#endif
+
     if(DmxAddress == 0) 
     {
         setRGB(255,255,255);
