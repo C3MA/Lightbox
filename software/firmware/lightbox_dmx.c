@@ -3,7 +3,7 @@
  *
  * Created: 08.06.2012
  *  Author: tobias
- *  Firmware version 2.0
+ *  Firmware version 2.1
  */ 
 #include <avr/io.h>
 #include <avr/pgmspace.h>
