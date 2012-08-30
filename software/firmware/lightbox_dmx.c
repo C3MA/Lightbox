@@ -2,7 +2,7 @@
  * lightbox.c
  *
  * Created: 08.06.2012
- *  Author: tobias
+ *  Author: Florian Zahn (original-File created by tobias)
  *  Firmware version 2.1
  */ 
 #include <avr/io.h>
