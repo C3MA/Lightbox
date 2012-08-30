@@ -1,9 +1,9 @@
 /*
  * lightbox.c
  *
- * Created: 08.06.2012
- *  Author: Florian Zahn (original-File created by tobias)
- *  Firmware version 2.1
+ * Created: 08.06.2012, modified 30.08.2012
+ *  Author: tobias (extended to showbox at address 512 by fzahn)
+ *  Firmware version 2.2
  */ 
 #include <avr/io.h>
 #include <avr/pgmspace.h>
@@ -11,6 +11,7 @@
 #include <avr/sleep.h>
 #include <avr/wdt.h>
 #include "lib_dmx_in.h"
+#include <util/delay.h>
 
 #define DMX_ADDRESS_PORT_0 PINB
 #define DMX_ADDRESS_PIN_0  7
@@ -162,9 +163,10 @@ int main(void)
 
 #if USE_WDT
     // Init WDT 60 milisecends
-    wdt_enable(WDTO_60MS);
+    wdt_enable(WDTO_2S);
 #endif
 
+    /*
     if(DmxAddress == 0) 
     {
         setRGB(255,255,255);
@@ -174,17 +176,46 @@ int main(void)
         init_DMX_RX();
         setRGB(0,0,0);
     }
-    sei();
+     */
+    switch (DmxAddress) {
+        case 0:
+            while (1)
+            {
+            setRGB(255,255,255);
+            }
+            break;
+        case 511:
+            while (1) {
+                setRGB(255,0,0);
+                _delay_ms(1000);
+                setRGB(0,255,0);
+                _delay_ms(1000);
+                setRGB(0,0,255);
+                _delay_ms(1000);
+                setRGB(255,255,255);
+                _delay_ms(1000);
+            }
+            break;
+            
+        default:
+            init_DMX_RX();
+            setRGB(0,0,0);
+            sei();
+            set_sleep_mode(SLEEP_MODE_IDLE);
+            while(1)
+            {
+                sleep_mode();
+                setRGB(DmxRxField[0], DmxRxField[1], DmxRxField[2]);
+            }
+            
 
-    set_sleep_mode(SLEEP_MODE_IDLE);
+            
+    }
+
 	
     // Status-LED an
     // PORTD |= (1 << PD5);
 
-    while(1)
-    {
-        sleep_mode();
-        setRGB(DmxRxField[0], DmxRxField[1], DmxRxField[2]);
-    }
+
 }
 
