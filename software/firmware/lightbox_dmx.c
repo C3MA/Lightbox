@@ -3,7 +3,7 @@
  *
  * Created: 08.06.2012, modified 30.08.2012
  *  Author: tobias (extended to showbox at address 512 by fzahn)
- *  Firmware version 2.2
+ *  Firmware version 2.3
  */ 
 #include <avr/io.h>
 #include <avr/pgmspace.h>
@@ -40,6 +40,7 @@
 #define USE_WDT 1
 
 #if PWM_LOG_8
+const uint8_t showboxdelay = 20;
 
 const uint8_t pwmtable[32] PROGMEM =
 {
@@ -165,35 +166,48 @@ int main(void)
     // Init WDT 60 milisecends
     wdt_enable(WDTO_2S);
 #endif
-
-    /*
-    if(DmxAddress == 0) 
-    {
-        setRGB(255,255,255);
-    }
-    else
-    {
-        init_DMX_RX();
-        setRGB(0,0,0);
-    }
-     */
     switch (DmxAddress) {
         case 0:
+            //Testmodus, alle DIP-Schalter auf OFF
             while (1)
             {
             setRGB(255,255,255);
             }
             break;
         case 511:
+            //Showbox-Modus, alle DIP-Schalter auf ON
             while (1) {
-                setRGB(255,0,0);
-                _delay_ms(1000);
-                setRGB(0,255,0);
-                _delay_ms(1000);
-                setRGB(0,0,255);
-                _delay_ms(1000);
-                setRGB(255,255,255);
-                _delay_ms(1000);
+                int r,g,b;
+                r=g=b=0;
+                for(r=0;r<255;r++) {
+                    setRGB(r,g,b);
+                    _delay_ms(showboxdelay);
+                }
+                for(r=255;r>127;r--) {
+                    setRGB(r,g,b);
+                    _delay_ms(showboxdelay);
+                }
+                for(g=0;g<255;g++) {
+                    setRGB(r,g,b);
+                    _delay_ms(showboxdelay);
+                }
+                for(g=255;g>127;g--) {
+                    setRGB(r,g,b);
+                    _delay_ms(showboxdelay);
+                }
+                for(b=0;b<255;b++) {
+                    setRGB(r,g,b);
+                    _delay_ms(showboxdelay);
+                }
+                for(b=255;b>127;b--) {
+                    setRGB(r,g,b);
+                    _delay_ms(showboxdelay);
+                }
+                for(b=127;b!=0;b--) {
+                    r=g=b;
+                    setRGB(r,g,b);
+                    _delay_ms(showboxdelay);
+                }
             }
             break;
             
