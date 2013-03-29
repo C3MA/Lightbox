@@ -162,10 +162,6 @@ int main(void)
 
     initPWM();
 
-#if USE_WDT
-    // Init WDT 60 milisecends
-    wdt_enable(WDTO_2S);
-#endif
     switch (DmxAddress) {
         case 0:
             //Testmodus, alle DIP-Schalter auf OFF
@@ -176,6 +172,11 @@ int main(void)
             break;
         case 511:
             //Showbox-Modus, alle DIP-Schalter auf ON
+            #if USE_WDT
+    		// Init WDT 2 seconds
+    		wdt_enable(WDTO_2S);
+	    #endif
+            
             while (1) {
                 int r,g,b;
                 r=g=b=0;
@@ -208,10 +209,18 @@ int main(void)
                     setRGB(r,g,b);
                     _delay_ms(showboxdelay);
                 }
+                #if USE_WDT
+    			wdt_reset();
+		#endif
             }
             break;
             
         default:
+            #if USE_WDT
+    		// Init WDT 60 miliseconds
+    		wdt_enable(WDTO_60MS);
+	    #endif
+            
             init_DMX_RX();
             setRGB(0,0,0);
             sei();
@@ -225,11 +234,8 @@ int main(void)
 
             
     }
-
 	
     // Status-LED an
     // PORTD |= (1 << PD5);
-
-
 }
 
