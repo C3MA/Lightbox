@@ -164,11 +164,16 @@ int main(void)
 
     switch (DmxAddress) {
         case 0:
+            #if USE_WDT
+    		// Init WDT 2 seconds
+    		wdt_enable(WDTO_2S);
+	    #endif
             //Testmodus, alle DIP-Schalter auf OFF
             while (1)
             {
             setRGB(255,255,255);
             }
+
             break;
         case 511:
             //Showbox-Modus, alle DIP-Schalter auf ON
