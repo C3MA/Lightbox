@@ -1,9 +1,9 @@
 /*
  * lightbox.c
  *
- * Created: 08.06.2012
- *  Author: tobias
- *  Firmware version 2.1
+ * Created: 08.06.2012, modified 30.08.2012
+ *  Author: tobias (extended to showbox at address 512 by fzahn)
+ *  Firmware version 2.3
  */ 
 #include <avr/io.h>
 #include <avr/pgmspace.h>
@@ -11,6 +11,7 @@
 #include <avr/sleep.h>
 #include <avr/wdt.h>
 #include "lib_dmx_in.h"
+#include <util/delay.h>
 
 #define DMX_ADDRESS_PORT_0 PINB
 #define DMX_ADDRESS_PIN_0  7
@@ -39,6 +40,7 @@
 #define USE_WDT 1
 
 #if PWM_LOG_8
+const uint8_t showboxdelay = 20;
 
 const uint8_t pwmtable[32] PROGMEM =
 {
@@ -160,31 +162,80 @@ int main(void)
 
     initPWM();
 
-#if USE_WDT
-    // Init WDT 60 milisecends
-    wdt_enable(WDTO_60MS);
-#endif
+    switch (DmxAddress) {
+        case 0:
+            //Testmodus, alle DIP-Schalter auf OFF
+            while (1)
+            {
+            setRGB(255,255,255);
+            }
+            break;
+        case 511:
+            //Showbox-Modus, alle DIP-Schalter auf ON
+            #if USE_WDT
+    		// Init WDT 2 seconds
+    		wdt_enable(WDTO_2S);
+	    #endif
+            
+            while (1) {
+                int r,g,b;
+                r=g=b=0;
+                for(r=0;r<255;r++) {
+                    setRGB(r,g,b);
+                    _delay_ms(showboxdelay);
+                }
+                for(r=255;r>127;r--) {
+                    setRGB(r,g,b);
+                    _delay_ms(showboxdelay);
+                }
+                for(g=0;g<255;g++) {
+                    setRGB(r,g,b);
+                    _delay_ms(showboxdelay);
+                }
+                for(g=255;g>127;g--) {
+                    setRGB(r,g,b);
+                    _delay_ms(showboxdelay);
+                }
+                for(b=0;b<255;b++) {
+                    setRGB(r,g,b);
+                    _delay_ms(showboxdelay);
+                }
+                for(b=255;b>127;b--) {
+                    setRGB(r,g,b);
+                    _delay_ms(showboxdelay);
+                }
+                for(b=127;b!=0;b--) {
+                    r=g=b;
+                    setRGB(r,g,b);
+                    _delay_ms(showboxdelay);
+                }
+                #if USE_WDT
+    			wdt_reset();
+		#endif
+            }
+            break;
+            
+        default:
+            #if USE_WDT
+    		// Init WDT 60 miliseconds
+    		wdt_enable(WDTO_60MS);
+	    #endif
+            
+            init_DMX_RX();
+            setRGB(0,0,0);
+            sei();
+            set_sleep_mode(SLEEP_MODE_IDLE);
+            while(1)
+            {
+                sleep_mode();
+                setRGB(DmxRxField[0], DmxRxField[1], DmxRxField[2]);
+            }
+            
 
-    if(DmxAddress == 0) 
-    {
-        setRGB(255,255,255);
+            
     }
-    else
-    {
-        init_DMX_RX();
-        setRGB(0,0,0);
-    }
-    sei();
-
-    set_sleep_mode(SLEEP_MODE_IDLE);
 	
     // Status-LED an
     // PORTD |= (1 << PD5);
-
-    while(1)
-    {
-        sleep_mode();
-        setRGB(DmxRxField[0], DmxRxField[1], DmxRxField[2]);
-    }
 }
 
